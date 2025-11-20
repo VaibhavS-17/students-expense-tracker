@@ -214,7 +214,7 @@ function updateBalance() {
   incomeEl.classList.remove('value-expense');
   incomeEl.classList.add('value-income');
 
-  // FIX: Ensures expense value is always red (value-expense)
+  // Ensures expense value is always red (value-expense)
   expenseEl.textContent = formatCurrency(expense);
   expenseEl.classList.remove('value-income'); 
   expenseEl.classList.add('value-expense');
@@ -246,8 +246,10 @@ function updateCharts() {
       labels: pieLabels.length ? pieLabels : ['No data'],
       datasets: [{
         data: pieData.length ? pieData : [1],
-        backgroundColor: ['#ff6b6b','#ffd166','#06d6a0','#4d96ff','#9b5de5','#f15bb5'],
-        borderWidth: 0
+        backgroundColor: pieData.length 
+    ? ['#ff6b6b','#ffd166','#06d6a0','#4d96ff','#9b5de5','#f15bb5']
+    : ['#e2e8f0'], 
+  borderWidth: 0
       }]
     },
     options: { plugins: { legend: { position: 'bottom' } } }

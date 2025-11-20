@@ -223,6 +223,12 @@ button.danger{
   margin-bottom:15px;
   color:var(--accent-2);
 }
+/* Animation for new items */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 #list{ list-style:none; }
 #list li{
   display:flex;
@@ -234,6 +240,7 @@ button.danger{
   background: linear-gradient(180deg,#fff,#fbfbfb);
   box-shadow:0 6px 16px rgba(18,30,40,0.04);
   border-left:6px solid transparent;
+  animation: slideln 0.3s ease forwards;
 }
 #list li:hover {
   background: var(--bg);
@@ -380,4 +387,11 @@ button.danger{
   #list li {
     padding: 10px;
   }
+}
+
+/* Remove up/down arrows from number inputs */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
