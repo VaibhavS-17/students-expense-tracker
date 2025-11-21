@@ -89,25 +89,20 @@
         <h3>Filter Transactions</h3>
         <div class="filters">
           <input type="text" id="search-text" placeholder="Search description..." />
+          
           <select id="filter-category">
             <option value="all">All Categories</option>
           </select>
           
-          <input 
-            type="text" 
-            id="filter-from" 
-            placeholder="From Date" 
-            onfocus="(this.type='date')" 
-            onblur="(this.type=this.value?'date':'text')" 
-          />
+          <div class="filter-date-group">
+            <label>From Date</label>
+            <input type="date" id="filter-from" />
+          </div>
           
-          <input 
-            type="text" 
-            id="filter-to" 
-            placeholder="To Date" 
-            onfocus="(this.type='date')" 
-            onblur="(this.type=this.value?'date':'text')" 
-          />
+          <div class="filter-date-group">
+            <label>To Date</label>
+            <input type="date" id="filter-to" />
+          </div>
 
           <button id="apply-filters">Apply Filters</button>
           <button id="clear-filters" class="secondary">Clear Filters</button>

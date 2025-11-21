@@ -534,3 +534,21 @@ body.dark-mode #list li:hover {
 body.dark-mode .chart-card canvas {
   filter: brightness(0.9);
 }
+
+/* ---- FIX FOR FILTER DATE LABELS ---- */
+/* This ensures the label sits nicely above the input */
+.filter-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* Matches the width behavior of other inputs */
+  flex: 1 1 120px; 
+  width: 100%; 
+}
+
+.filter-date-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-2);
+  margin-left: 2px;
+}
