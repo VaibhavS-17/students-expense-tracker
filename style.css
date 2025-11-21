@@ -1,4 +1,4 @@
-/* style.css - Final Mobile-Safe Version */
+/* style.css - Final Version (Desktop & Mobile Optimized) */
 
 /* Google font loaded in HTML */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +48,6 @@ body{
   box-shadow:var(--shadow);
   text-align:center;
 }
-/* Logo styles (if you add logo back later) */
 .left-panel img{
   width:100px; height:100px; object-fit:cover; border-radius:50%; margin-bottom:10px; border:3px solid #fff;
 }
@@ -217,6 +216,22 @@ button.danger{
   white-space:nowrap;
 }
 
+/* ---- FIX FOR FILTER DATE LABELS (GLOBAL) ---- */
+/* Placed here so it works on PC and Mobile */
+.filter-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1 1 120px; 
+  width: 100%; 
+}
+
+.filter-date-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-2);
+  margin-left: 2px;
+}
 
 /* transaction list */
 .history{ margin-top:20px; }
@@ -308,127 +323,6 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
   margin: 0; 
-}
-
-/* ========================================= */
-/* RESPONSIVE / MOBILE OPTIMIZATIONS    */
-/* ========================================= */
-
-/* TABLET View (Stack columns, but keep padding) */
-@media (max-width: 980px){
-  .page{ 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 15px; 
-  }
-  .panel{ width: 100%; max-width: 100%; }
-  .container{ width: 100%; max-width: 100%; }
-}
-
-/* MOBILE View (Phones only) */
-@media (max-width: 768px){
-  
-  /* 0. CRITICAL FIX: Reduce Side Empty Space for Mobile Only */
-  body {
-    padding: 10px; /* Overrides the 28px from Desktop */
-  }
-  
-      /* 1. Header Layout Fix */
-  .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* This vertically centers the button */
-    margin-bottom: 15px;
-    gap: 10px; /* Adds space between title and button */
-  }
-  
-  .header-row h1 {
-    font-size: 22px; /* Optimized size for mobile */
-    line-height: 1.2;
-    margin-right: auto; 
-    margin-bottom: 0; /* Remove bottom margin so it aligns with button */
-  }
-
-  /* Fix for the Button */
-  .theme-btn {
-    white-space: nowrap; /* Forces "Dark Mode" to stay on one line */
-    padding: 8px 12px;   /* Compact padding */
-    font-size: 12px;     
-    flex-shrink: 0;      /* Prevents the button from being squished */
-    height: auto;        /* Prevents stretching */
-    width: auto;
-  }
-
-  
-  /* 2. Compact Summary Cards (Grid Layout) */
-  .balance-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px; 
-  }
-  .card:first-child {
-    grid-column: 1 / -1; 
-    background: #f8fcfd;
-  }
-  .card { flex: none; padding: 12px; }
-  .card h4 { font-size: 12px; }
-  .card .value { font-size: 20px; }
-
-  /* 3. Form Inputs */
-  .row {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .row > div {
-    width: 100%; 
-    min-width: auto;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .form-actions button {
-    width: 100%;
-    padding: 12px; 
-  }
-
-  /* 4. Filter Section */
-  .filters {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .filters input, .filters select, .filters button {
-    width: 100%;
-    flex: none; 
-    height: auto; 
-    padding: 10px 12px; 
-  }
-
-  /* 5. General Spacing */
-  .form-card, .filter-card { padding: 15px; }
-  
-  /* 6. Compact Charts */
-  .chart-card {
-    height: 220px; 
-    width: 100%;      
-    flex: 1 1 100%;   
-    min-width: 0;     
-  }
-  
-  /* 7. Transaction List */
-  .tx-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-  .tx-meta { font-size: 11px; }
-  #list li { padding: 10px; }
 }
 
 /* ========================================= */
@@ -535,20 +429,122 @@ body.dark-mode .chart-card canvas {
   filter: brightness(0.9);
 }
 
-/* ---- FIX FOR FILTER DATE LABELS ---- */
-/* This ensures the label sits nicely above the input */
-.filter-date-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  /* Matches the width behavior of other inputs */
-  flex: 1 1 120px; 
-  width: 100%; 
+/* ========================================= */
+/* RESPONSIVE / MOBILE OPTIMIZATIONS    */
+/* ========================================= */
+
+/* TABLET View (Stack columns, but keep padding) */
+@media (max-width: 980px){
+  .page{ 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 15px; 
+  }
+  .panel{ width: 100%; max-width: 100%; }
+  .container{ width: 100%; max-width: 100%; }
 }
 
-.filter-date-group label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-2);
-  margin-left: 2px;
+/* MOBILE View (Phones only) */
+@media (max-width: 768px){
+  
+  /* 0. CRITICAL FIX: Reduce Side Empty Space for Mobile Only */
+  body {
+    padding: 10px; /* Overrides the 28px from Desktop */
+  }
+  
+  /* 1. Header Layout Fix */
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* This vertically centers the button */
+    margin-bottom: 15px;
+    gap: 10px; /* Adds space between title and button */
+  }
+  
+  .header-row h1 {
+    font-size: 22px; /* Optimized size for mobile */
+    line-height: 1.2;
+    margin-right: auto; 
+    margin-bottom: 0; /* Remove bottom margin so it aligns with button */
+  }
+
+  /* Fix for the Button */
+  .theme-btn {
+    white-space: nowrap; /* Forces "Dark Mode" to stay on one line */
+    padding: 8px 12px;   /* Compact padding */
+    font-size: 12px;     
+    flex-shrink: 0;      /* Prevents the button from being squished */
+    height: auto;        /* Prevents stretching */
+    width: auto;
+  }
+  
+  /* 2. Compact Summary Cards (Grid Layout) */
+  .balance-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; 
+  }
+  .card:first-child {
+    grid-column: 1 / -1; 
+    background: #f8fcfd;
+  }
+  .card { flex: none; padding: 12px; }
+  .card h4 { font-size: 12px; }
+  .card .value { font-size: 20px; }
+
+  /* 3. Form Inputs */
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .row > div {
+    width: 100%; 
+    min-width: auto;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .form-actions button {
+    width: 100%;
+    padding: 12px; 
+  }
+
+  /* 4. Filter Section */
+  .filters {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filters input, .filters select, .filters button {
+    width: 100%;
+    flex: none; 
+    height: auto; 
+    padding: 10px 12px; 
+  }
+
+  /* 5. General Spacing */
+  .form-card, .filter-card { padding: 15px; }
+  
+  /* 6. Compact Charts */
+  .chart-card {
+    height: 220px; 
+    width: 100%;      
+    flex: 1 1 100%;   
+    min-width: 0;     
+  }
+  
+  /* 7. Transaction List */
+  .tx-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .tx-meta { font-size: 11px; }
+  #list li { padding: 10px; }
 }
