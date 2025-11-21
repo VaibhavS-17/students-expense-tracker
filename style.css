@@ -391,3 +391,33 @@ input[type=number]::-webkit-outer-spin-button {
   .tx-meta { font-size: 11px; }
   #list li { padding: 10px; }
 }
+
+/* ---- PDF PRINT STYLES ---- */
+.printing {
+  background: white !important;
+  padding: 20px !important;
+}
+
+/* Hide buttons and controls in PDF */
+.printing .delete-btn, 
+.printing .edit-btn,
+.printing .export-row,
+.printing .small-note {
+  display: none !important;
+}
+
+/* Clean up list style for PDF */
+.printing #list li {
+  box-shadow: none;
+  border: 1px solid #eee;
+  margin-bottom: 5px;
+  break-inside: avoid; /* Keeps items from being cut in half */
+}
+
+/* Better Chart Sizing for PDF */
+.printing .chart-card {
+  box-shadow: none;
+  border: 1px solid #eee;
+  height: 300px !important; /* Fix height so it doesn't stretch */
+  page-break-inside: avoid;
+}

@@ -361,34 +361,57 @@ function exportToCsv() {
 
 // ---- Download PDF (Fixed for Blank Page) ----
 function downloadPdf() {
-  // FORCE SCROLL TO TOP (Fixes blank screenshot issue)
+  // 1. Scroll to top to ensure everything is captured
   window.scrollTo(0, 0);
 
   const element = document.getElementById('report-area');
+  const balanceCards = document.querySelector('.balance-container');
+  
+  // 2. PREPARE FOR PRINT: Add styling class
+  element.classList.add('printing'); 
+  
+  // 3. Inject Custom Header (Title + Date)
+  const titleDiv = document.createElement('div');
+  titleDiv.innerHTML = `
+    <h1 style="text-align:center; color:#264653; margin-bottom:5px;">Expense Report</h1>
+    <p style="text-align:center; color:#6c7a86; margin-bottom:20px; font-size:12px;">
+      Generated on: ${new Date().toLocaleDateString()} | Student's Expense Tracker
+    </p>
+    <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
+  `;
+  
+  // 4. Clone Balance Cards (So we see totals in the PDF!)
+  const summaryClone = balanceCards.cloneNode(true);
+  
+  // Insert Header & Balance Cards at the TOP of the report area
+  element.prepend(summaryClone);
+  element.prepend(titleDiv);
+
+  // 5. Generate PDF
   const opt = {
-    margin:       0.3,
+    margin:       0.5,
     filename:     `Expense_Report_${new Date().toISOString().slice(0,10)}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { 
-      scale: 2, 
-      useCORS: true,
-      scrollY: 0  // Fix: Ignores current scroll position
-    }, 
+    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
 
-  const btnRow = document.querySelector('.export-row');
-  if(btnRow) btnRow.setAttribute('data-html2canvas-ignore', 'true');
-
-  html2pdf()
-    .set(opt)
-    .from(element)
-    .save()
+  html2pdf().set(opt).from(element).save()
     .then(() => {
-      if(btnRow) btnRow.removeAttribute('data-html2canvas-ignore');
+      // 6. CLEANUP: Remove the temporary elements after download
+      element.classList.remove('printing');
+      element.removeChild(titleDiv);
+      element.removeChild(summaryClone);
     })
-    .catch(err => console.error("PDF Generation Error:", err));
+    .catch(err => {
+      console.error("PDF Error:", err);
+      // Emergency cleanup in case of error
+      element.classList.remove('printing');
+      if(element.contains(titleDiv)) element.removeChild(titleDiv);
+      if(element.contains(summaryClone)) element.removeChild(summaryClone);
+    });
 }
+
 
 function clearAllData() {
   if (confirm('Are you sure you want to clear ALL transaction data? This action cannot be undone.')) {
