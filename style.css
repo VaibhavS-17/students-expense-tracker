@@ -392,13 +392,13 @@ input[type=number]::-webkit-outer-spin-button {
   #list li { padding: 10px; }
 }
 
-/* ---- PDF PRINT STYLES ---- */
+/* ---- PDF PRINT STYLES (High Contrast for Sharp Reports) ---- */
 .printing {
   background: white !important;
   padding: 20px !important;
 }
 
-/* Hide buttons and controls in PDF */
+/* 1. Hide buttons and controls */
 .printing .delete-btn, 
 .printing .edit-btn,
 .printing .export-row,
@@ -406,18 +406,38 @@ input[type=number]::-webkit-outer-spin-button {
   display: none !important;
 }
 
-/* Clean up list style for PDF */
-.printing #list li {
-  box-shadow: none;
-  border: 1px solid #eee;
-  margin-bottom: 5px;
-  break-inside: avoid; /* Keeps items from being cut in half */
+/* 2. High Contrast Text (Fixes Faintness) */
+.printing * {
+  color: #000000 !important; /* Force everything to Pitch Black */
 }
 
-/* Better Chart Sizing for PDF */
+.printing .tx-desc {
+  font-weight: 800 !important; /* Extra Bold for Description */
+  font-size: 14px !important;
+}
+
+.printing .tx-meta {
+  color: #333 !important; /* Darker Grey for date/category */
+  font-weight: 600 !important;
+}
+
+.printing .tx-amount {
+  font-weight: 900 !important; /* Heavy Bold for Amounts */
+  font-size: 15px !important;
+}
+
+/* 3. Clean Borders */
+.printing #list li {
+  box-shadow: none;
+  border: 1px solid #000; /* Dark border for clarity */
+  margin-bottom: 5px;
+  break-inside: avoid;
+}
+
+/* 4. Chart Visibility */
 .printing .chart-card {
   box-shadow: none;
-  border: 1px solid #eee;
-  height: 300px !important; /* Fix height so it doesn't stretch */
+  border: 1px solid #000;
+  height: 300px !important;
   page-break-inside: avoid;
 }
