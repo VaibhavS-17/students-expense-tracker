@@ -392,10 +392,11 @@ input[type=number]::-webkit-outer-spin-button {
   #list li { padding: 10px; }
 }
 
-/* ---- PDF PRINT STYLES (High Contrast for Sharp Reports) ---- */
+/* ---- PDF PRINT STYLES (Professional: Bold Text + Color Amounts) ---- */
 .printing {
   background: white !important;
   padding: 20px !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* 1. Hide buttons and controls */
@@ -406,38 +407,45 @@ input[type=number]::-webkit-outer-spin-button {
   display: none !important;
 }
 
-/* 2. High Contrast Text (Fixes Faintness) */
-.printing * {
-  color: #000000 !important; /* Force everything to Pitch Black */
-}
-
+/* 2. Make Description and Meta Data DARK BLACK */
 .printing .tx-desc {
-  font-weight: 800 !important; /* Extra Bold for Description */
+  color: #000 !important; 
+  font-weight: 800 !important;
   font-size: 14px !important;
 }
-
 .printing .tx-meta {
-  color: #333 !important; /* Darker Grey for date/category */
+  color: #444 !important; 
   font-weight: 600 !important;
 }
-
-.printing .tx-amount {
-  font-weight: 900 !important; /* Heavy Bold for Amounts */
-  font-size: 15px !important;
+.printing h4 {
+  color: #000 !important; /* Card titles */
 }
 
-/* 3. Clean Borders */
+/* 3. KEEP THE COLORS for Income & Expense (The Important Fix) */
+.printing .value-income,
+.printing .tx-amount.income {
+  color: #2ea44f !important; /* Bright Green */
+  font-weight: 800 !important;
+}
+
+.printing .value-expense,
+.printing .tx-amount.expense {
+  color: #e63946 !important; /* Bright Red */
+  font-weight: 800 !important;
+}
+
+/* 4. Clean Borders */
 .printing #list li {
   box-shadow: none;
-  border: 1px solid #000; /* Dark border for clarity */
+  border: 1px solid #ddd;
   margin-bottom: 5px;
   break-inside: avoid;
 }
 
-/* 4. Chart Visibility */
+/* 5. Chart Visibility */
 .printing .chart-card {
   box-shadow: none;
-  border: 1px solid #000;
+  border: 1px solid #ddd;
   height: 300px !important;
   page-break-inside: avoid;
 }
