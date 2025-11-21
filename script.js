@@ -70,7 +70,7 @@ function addTransaction(e) {
   const date = dateEl.value;
   const type = typeEl.value;
 
-  // FIX: Added checks for amount: is it a valid number AND is it greater than zero?
+  //  Added checks for amount: is it a valid number AND is it greater than zero?
   const isAmountValid = !isNaN(amount) && isFinite(amount) && amount > 0;
 
   if (description === '' || !isAmountValid || category === '') {
@@ -382,17 +382,34 @@ function exportToCsv() {
   URL.revokeObjectURL(url);
 }
 
-// ---- Download PDF (report area) ----
+// ---- Download PDF ----
 function downloadPdf() {
   const element = document.getElementById('report-area');
+  
+  // 1. Options to make it look better
   const opt = {
-    margin:       0.3,
+    margin:       0.5,
     filename:     `Expense_Report_${new Date().toISOString().slice(0,10)}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
+    html2canvas:  { scale: 2, useCORS: true }, // 'useCORS' is important for Charts!
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
-  html2pdf().set(opt).from(element).save();
+
+  // 2. Hide the buttons during PDF generation
+  // We add a special class that html2pdf looks for to ignore elements
+  const btnRow = document.querySelector('.export-row');
+  if(btnRow) btnRow.setAttribute('data-html2canvas-ignore', 'true');
+
+  // 3. Generate
+  html2pdf()
+    .set(opt)
+    .from(element)
+    .save()
+    .then(() => {
+      // Optional: Remove the ignore attribute after (not strictly necessary but clean)
+      if(btnRow) btnRow.removeAttribute('data-html2canvas-ignore');
+    })
+    .catch(err => console.error("PDF Generation Error:", err));
 }
 
 function clearAllData() {
