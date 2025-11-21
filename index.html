@@ -96,12 +96,24 @@
           
           <div class="filter-date-group">
             <label>From Date</label>
-            <input type="date" id="filter-from" />
+            <input 
+              type="text" 
+              id="filter-from" 
+              placeholder="Select Date"
+              onfocus="(this.type='date')"
+              onblur="(this.value ? this.type='date' : this.type='text')"
+            />
           </div>
           
           <div class="filter-date-group">
             <label>To Date</label>
-            <input type="date" id="filter-to" />
+            <input 
+              type="text" 
+              id="filter-to" 
+              placeholder="Select Date"
+              onfocus="(this.type='date')"
+              onblur="(this.value ? this.type='date' : this.type='text')"
+            />
           </div>
 
           <button id="apply-filters">Apply Filters</button>
