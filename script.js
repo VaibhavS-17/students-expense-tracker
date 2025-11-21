@@ -451,3 +451,28 @@ document.getElementById('search-text').addEventListener('input', function() {
 // Initial render
 updateCategoryOptions();
 renderTransactions();
+
+// ---- Dark Mode Logic ----
+
+const themeToggleBtn = document.getElementById('theme-toggle');
+const body = document.body;
+
+// 1. Check LocalStorage on load
+const currentTheme = localStorage.getItem('theme');
+if (currentTheme === 'dark') {
+  body.classList.add('dark-mode');
+  themeToggleBtn.textContent = '☀️ Light Mode';
+}
+
+// 2. Toggle on click
+themeToggleBtn.addEventListener('click', () => {
+  body.classList.toggle('dark-mode');
+  
+  if (body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+    themeToggleBtn.textContent = '☀️ Light Mode';
+  } else {
+    localStorage.setItem('theme', 'light');
+    themeToggleBtn.textContent = '🌙 Dark Mode';
+  }
+});

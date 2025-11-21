@@ -449,3 +449,71 @@ input[type=number]::-webkit-outer-spin-button {
   height: 300px !important;
   page-break-inside: avoid;
 }
+
+/* ---- DARK MODE STYLES ---- */
+
+/* 1. Header Layout */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.theme-btn {
+  background: #264653;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+/* 2. Dark Theme Colors */
+body.dark-mode {
+  background: #121212; /* Very dark grey background */
+  color: #e0e0e0;
+}
+
+/* Cards turn dark grey */
+body.dark-mode .card, 
+body.dark-mode .form-card, 
+body.dark-mode .filter-card,
+body.dark-mode .chart-card,
+body.dark-mode .panel {
+  background: #1e1e1e;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Stronger shadow */
+}
+
+/* Inputs turn dark */
+body.dark-mode input, 
+body.dark-mode select {
+  background: #2d2d2d;
+  border-color: #444;
+  color: #fff;
+}
+
+/* Text Adjustments */
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3,
+body.dark-mode label,
+body.dark-mode .tx-desc {
+  color: #ffffff;
+}
+
+body.dark-mode .muted,
+body.dark-mode .tx-meta {
+  color: #aaaaaa;
+}
+
+/* List Items */
+body.dark-mode #list li {
+  background: #2d2d2d;
+  border: 1px solid #333;
+}
+body.dark-mode #list li:hover {
+  background: #383838;
+}
+
+/* Fix Chart Text Color (Optional: Charts usually look okay on dark) */
+body.dark-mode .chart-card canvas {
+  filter: brightness(0.9);
+}
