@@ -1,4 +1,4 @@
-// Student's Expense Tracker - Core Logic
+// Student's Expense Tracker - Core Logic (UPDATED)
 
 function escapeHtml(text) {
   if (!text) return text;
@@ -15,7 +15,6 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   
-  // Choose icon based on type
   let icon = 'ℹ️';
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '⚠️';
@@ -23,7 +22,6 @@ function showToast(message, type = 'info') {
   toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
   toastContainer.appendChild(toast);
 
-  // Remove element from DOM after animation ends (3.5 seconds)
   setTimeout(() => {
     toast.remove();
   }, 3500);
@@ -63,8 +61,15 @@ const categories = {
   income: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
 };
 
-// 3. Initialize Data
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+// 3. Initialize Data (UPDATED: Safer Parsing)
+let transactions = [];
+try {
+  const localData = localStorage.getItem('transactions');
+  transactions = localData ? JSON.parse(localData) : [];
+} catch (error) {
+  console.error("Error parsing local storage data", error);
+  transactions = []; // Fallback to empty if corrupted
+}
 
 // Set default date to today
 if (!dateEl.value) {
@@ -72,9 +77,9 @@ if (!dateEl.value) {
   dateEl.value = today;
 }
 
-// Helper: Format Currency
+// Helper: Format Currency (UPDATED: Math.abs to prevent -0)
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Math.abs(amount));
 }
 
 // Helper: Save to LocalStorage
@@ -95,9 +100,7 @@ function addTransaction(e) {
   const date = dateEl.value;
   const type = typeEl.value;
 
-  // Validation Check
   if (description === '' || isNaN(amount) || amount <= 0 || category === '') {
-    // UPGRADE: Use Toast instead of Alert
     showToast('Please fill in all fields correctly!', 'error');
     return;
   }
@@ -110,7 +113,6 @@ function addTransaction(e) {
   dateEl.value = new Date().toLocaleDateString('en-CA'); 
   updateCategoryOptions();
   
-  // UPGRADE: Show Success Message
   showToast('Transaction added successfully!', 'success');
 }
 
@@ -170,8 +172,13 @@ function updateTransaction() {
   }
 }
 
-// 7. Render List & Update UI
-function renderTransactions(txs = transactions) {
+// 7. Render List & Update UI (UPDATED: Default Sorting)
+function renderTransactions(txs) {
+  // Default: Sort by Date Descending (Newest First) if no filter is applied
+  if (!txs) {
+    txs = transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
   listEl.innerHTML = '';
   if (txs.length === 0) {
     listEl.innerHTML = '<li style="justify-content:center; color:#6c7a86;">No transactions found.</li>';
@@ -215,7 +222,8 @@ function updateBalance() {
   expenseEl.className = 'value value-expense';
   balanceEl.textContent = formatCurrency(total);
   balanceEl.className = total < 0 ? 'value value-expense' : 'value value-income';
-    // --- START NEW BUDGET LOGIC ---
+  
+  // Budget Logic
   let budgetLimit = Number(localStorage.getItem('budgetLimit')) || 0;
   const budgetBar = document.getElementById('budget-bar');
   const budgetText = document.getElementById('budget-text');
@@ -227,25 +235,24 @@ function updateBalance() {
     budgetVal.textContent = `Limit: ${formatCurrency(budgetLimit)}`;
     
     if (expense > budgetLimit) {
-      budgetBar.style.backgroundColor = '#e63946'; // Red (Danger)
+      budgetBar.style.backgroundColor = '#e63946'; // Red
       budgetText.innerHTML = `⚠️ Over Budget! (${Math.round((expense/budgetLimit)*100)}%)`;
       budgetText.style.color = '#e63946';
     } else if (percent > 80) {
-      budgetBar.style.backgroundColor = '#e9c46a'; // Yellow (Warning)
+      budgetBar.style.backgroundColor = '#e9c46a'; // Yellow
       budgetText.innerHTML = `⚠️ Warning: ${Math.round(percent)}% Used`;
       budgetText.style.color = '#e9c46a';
     } else {
-      budgetBar.style.backgroundColor = '#2a9d8f'; // Teal (Safe)
+      budgetBar.style.backgroundColor = '#2a9d8f'; // Teal
       budgetText.innerHTML = `Spending: ${Math.round(percent)}%`;
       budgetText.style.color = 'var(--muted)';
     }
   } else {
     budgetBar.style.width = '0%';
-    budgetBar.style.backgroundColor = '#e0e0e0'; // Grey out the bar
-    budgetText.innerHTML = "<i>No monthly limit set</i>"; // Use italics for style
-    budgetVal.textContent = ""; // Hide the "Limit: ₹0" text to reduce clutter
+    budgetBar.style.backgroundColor = '#e0e0e0';
+    budgetText.innerHTML = "<i>No monthly limit set</i>";
+    budgetVal.textContent = "";
   }
-  // --- END NEW BUDGET LOGIC ---
 }
 
 // 8. Chart Logic
@@ -274,6 +281,7 @@ function updateCharts() {
   });
 
   const dateMap = {};
+  // Sort for chart chronologically (Oldest -> Newest)
   const sorted = transactions.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   let running = 0;
   sorted.forEach(t => {
@@ -317,9 +325,9 @@ function updateCategoryOptions() {
   });
 }
 
-// 9. Filters & Exports
+// 9. Filters & Exports (UPDATED: Case Insensitive Search)
 function applyFilters() {
-  const sText = document.getElementById('search-text').value.toLowerCase();
+  const sText = document.getElementById('search-text').value.trim().toLowerCase();
   const cat = filterCategory.value;
   const from = filterFrom.value ? new Date(filterFrom.value) : null;
   const to = filterTo.value ? new Date(filterTo.value) : null;
@@ -331,7 +339,7 @@ function applyFilters() {
     if (from && tDate < from) return false;
     if (to && tDate > to) return false;
     return true;
-  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+  }).sort((a,b) => new Date(b.date) - new Date(a.date)); // Always sort filtered results by date desc
   renderTransactions(filtered);
 }
 
@@ -345,7 +353,6 @@ function clearFilters() {
 
 function exportToCsv() {
   if (!transactions.length) { 
-    // UPGRADE: Use Toast
     showToast('No data available to export!', 'error'); 
     return; 
   }
@@ -366,7 +373,6 @@ function exportToCsv() {
   a.download = `expense_tracker_${new Date().toLocaleDateString('en-CA')}.csv`;
   a.click();
   
-  // UPGRADE: Show Success Message
   showToast('CSV file downloaded!', 'success');
 }
 
@@ -397,7 +403,6 @@ function clearAllData() {
     transactions = []; 
     saveTransactions(); 
     renderTransactions(); 
-    // UPGRADE: Show Success Message
     showToast('All data has been cleared.', 'info');
   }
 }
@@ -439,7 +444,7 @@ document.getElementById('set-budget-btn').addEventListener('click', () => {
   
   if (input !== null && !isNaN(input) && Number(input) > 0) {
     localStorage.setItem('budgetLimit', input);
-    updateBalance(); // Refresh the bar immediately
+    updateBalance(); 
     showToast(`Budget limit set to ₹${input}`, 'success');
   } else if (input !== null) {
     showToast('Please enter a valid number!', 'error');
