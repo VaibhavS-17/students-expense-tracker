@@ -1,21 +1,23 @@
-/* style.css - Final Unified Version */
+/* style.css - Professional Responsive Design */
 
-/* Google font loaded in HTML */
+/* ========================================= */
+/* 1. GLOBAL VARIABLES & RESET         */
+/* ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root{
   --bg: #f2f6f9;
   --card: #ffffff;
   --muted: #6c7a86;
-  --accent: #2a9d8f;   /* teal */
-  --accent-2: #264653; /* dark navy */
-  --danger: #e63946;
+  --accent: #2a9d8f;   /* Teal Green */
+  --accent-2: #264653; /* Dark Navy */
+  --danger: #e63946;   /* Red */
   --shadow: 0 10px 30px rgba(20,30,40,0.08);
   --max-width: 1200px;
 }
 
 /* Global Transitions */
-button, .card, #list li {
+button, .card, #list li, input, select {
   transition: all 0.3s ease;
 }
 
@@ -25,61 +27,61 @@ body{
   color: #122023;
   min-height: 100vh;
   padding: 28px; /* Desktop default padding */
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ========================================= */
-/* LAYOUT & PANELS                     */
+/* 2. LAYOUT STRUCTURE                 */
 /* ========================================= */
 .page{
-  display:flex;
-  gap:24px;
-  width:100%;
-  max-width:var(--max-width);
-  margin:0 auto;
-  align-items:flex-start;
-  justify-content:center;
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .panel{
-  flex:0 0 240px;
+  flex: 0 0 240px;
   background: linear-gradient(180deg, #1f2a35, #264653);
-  color:#fff;
-  border-radius:12px;
-  padding:20px;
-  box-shadow:var(--shadow);
-  text-align:center;
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
 }
-.left-panel h2{ font-size:18px; margin-top:0; }
-.left-panel p{ font-size:14px; margin-top:2px; }
+.left-panel h2{ font-size: 18px; margin-top: 0; }
+.left-panel p{ font-size: 14px; margin-top: 2px; }
 
 .container{
-  flex:1 1 500px;
-  max-width:700px;
+  flex: 1 1 500px;
+  max-width: 700px;
 }
 .container h1{
-  font-size:26px;
-  color:var(--accent-2);
-  margin-bottom:20px;
+  font-size: 26px;
+  color: var(--accent-2);
+  margin-bottom: 20px;
 }
 
 /* ========================================= */
-/* SUMMARY CARDS                       */
+/* 3. SUMMARY CARDS                    */
 /* ========================================= */
 .balance-container{
-  display:flex;
-  gap:12px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-  justify-content:center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .card{
-  flex:1 1 180px;
-  background:var(--card);
-  padding:16px;
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(18,30,40,0.05);
-  text-align:center;
+  flex: 1 1 180px;
+  background: var(--card);
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(18,30,40,0.05);
+  text-align: center;
   cursor: default;
 }
 .card:hover {
@@ -87,36 +89,36 @@ body{
   transform: translateY(-2px);
 }
 .card h4{
-  font-size:14px;
-  color:var(--muted);
-  font-weight:400;
-  margin-bottom:4px;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-bottom: 4px;
 }
 .card .value{
-  font-size:22px;
-  font-weight:700;
-  color:var(--accent-2);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-2);
 }
 .card .value-income { color: #2ea44f; }
 .card .value-expense { color: var(--danger); }
 
 /* ========================================= */
-/* FORMS & INPUTS (UNIFIED STYLES)     */
+/* 4. UNIFIED FORM STYLES              */
 /* ========================================= */
 .form-card, .filter-card{
-  background:var(--card);
-  padding:20px;
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  margin-bottom:20px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
 }
 .form-card h3, .filter-card h3{
-  font-size:18px;
-  margin-bottom:15px;
-  color:var(--accent-2);
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: var(--accent-2);
 }
 
-/* 1. Shared Input Styles (Applies to Top & Bottom Forms) */
+/* Shared Input Styles (Applies to Add & Filter) */
 .row input, .row select, 
 .filter-group input, .filter-group select {
   width: 100%;
@@ -129,41 +131,38 @@ body{
   min-width: 0;
   background: #fff;
   
-  /* Smooth Animation */
+  /* Smooth Animation & Shadow */
   box-shadow: 0 1px 4px rgba(18, 30, 40, 0.02);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 
-/* 2. Shared Focus State (The "Green Glow") */
+/* Shared Focus State (The "Green Glow") */
 .row input:focus, .row select:focus,
 .filter-group input:focus, .filter-group select:focus {
-  border-color: var(--accent); /* Green Border */
-  box-shadow: 0 0 0 4px rgba(42, 157, 143, 0.15); /* Green Glow */
+  border-color: var(--accent); 
+  box-shadow: 0 0 0 4px rgba(42, 157, 143, 0.15); 
   outline: none;
-  transform: translateY(-1px); /* Subtle Lift */
+  transform: translateY(-1px); 
 }
 
-/* Top Form Layout (Add Transaction) */
+/* Top Form Layout */
 .row{
-  display:flex;
-  gap:15px;
-  margin-bottom:15px;
-  align-items:flex-end;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: flex-end;
 }
-.row > div {
-  flex: 1 1 0; 
-  min-width: 120px;
-}
+.row > div { flex: 1 1 0; min-width: 120px; }
 .row label{
-  display:block;
-  font-size:14px;
-  color:var(--accent-2);
-  font-weight:600;
-  margin-bottom:5px;
-  width:100%;
+  display: block;
+  font-size: 14px;
+  color: var(--accent-2);
+  font-weight: 600;
+  margin-bottom: 5px;
+  width: 100%;
 }
 
-/* Bottom Form Layout (Filter Transactions) */
+/* Bottom Filter Layout */
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -184,69 +183,43 @@ body{
   margin-left: 2px;
 }
 
-/* Buttons Container */
+/* Button Containers */
 .form-actions, .filter-actions{
-  margin-top:20px;
+  margin-top: 20px;
   display: flex;
-  justify-content:flex-end;
+  justify-content: flex-end;
   gap: 10px;
   width: 100%;
 }
-.form-actions button, .filter-actions button{ flex:0 0 auto; white-space:nowrap; }
+.form-actions button, .filter-actions button{ flex: 0 0 auto; white-space: nowrap; }
 
 /* ========================================= */
-/* DATE INPUT FIX (Placeholder Trick)    */
-/* ========================================= */
-
-/* 1. When the date is empty (invalid), hide the ugly "dd/mm/yyyy" */
-input[type="date"]:invalid::-webkit-datetime-edit {
-  color: transparent;
-}
-
-/* 2. Show the "Select Date" text instead */
-input[type="date"]:invalid::before {
-  content: attr(placeholder);
-  color: #6c7a86;
-  margin-right: 5px;
-}
-
-/* 3. Ensure the calendar icon stays visible */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.6;
-  transition: 0.3s;
-}
-input[type="date"]:hover::-webkit-calendar-picker-indicator {
-  opacity: 1;
-}
-
-/* ========================================= */
-/* BUTTONS                             */
+/* 5. BUTTONS                          */
 /* ========================================= */
 button{
-  padding:10px 15px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:600;
-  background:var(--accent);
-  color:#fff;
-  font-family:'Poppins', sans-serif;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
 }
 button:active { transform: scale(0.98); }
-button:hover{ background:var(--accent-2); }
-button.secondary{ background:#f4f6f7; color:var(--accent-2); }
-button.secondary:hover{ background:#e5e9ec; }
-button.danger{ background:var(--danger); }
+button:hover{ background: var(--accent-2); }
+button.secondary{ background: #f4f6f7; color: var(--accent-2); }
+button.secondary:hover{ background: #e5e9ec; }
+button.danger{ background: var(--danger); }
 
 /* ========================================= */
-/* TRANSACTION LIST                    */
+/* 6. TRANSACTION LIST                 */
 /* ========================================= */
-.history{ margin-top:20px; }
+.history{ margin-top: 20px; }
 .history h3{
-  font-size:18px;
-  margin-bottom:15px;
-  color:var(--accent-2);
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: var(--accent-2);
 }
 
 @keyframes slideIn {
@@ -254,17 +227,17 @@ button.danger{ background:var(--danger); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-#list{ list-style:none; }
+#list{ list-style: none; }
 #list li{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 15px;
-  margin-bottom:8px;
-  border-radius:10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  border-radius: 10px;
   background: linear-gradient(180deg,#fff,#fbfbfb);
-  box-shadow:0 6px 16px rgba(18,30,40,0.04);
-  border-left:6px solid transparent;
+  box-shadow: 0 6px 16px rgba(18,30,40,0.04);
+  border-left: 6px solid transparent;
   animation: slideIn 0.3s ease forwards;
 }
 #list li:hover {
@@ -275,10 +248,10 @@ button.danger{ background:var(--danger); }
 #list li.income{ border-left-color: #2ea44f; }
 #list li.expense{ border-left-color: var(--danger); }
 
-.tx-left{ display:flex; gap:10px; align-items:center; }
-.tx-desc{ font-weight:600; color:#122023; }
-.tx-meta{ font-size:13px; color:var(--muted); }
-.tx-amount{ font-weight:700; }
+.tx-left{ display: flex; gap: 10px; align-items: center; }
+.tx-desc{ font-weight: 600; color: #122023; }
+.tx-meta{ font-size: 13px; color: var(--muted); }
+.tx-amount{ font-weight: 700; }
 #list .tx-amount.income { color: #2ea44f; }
 #list .tx-amount.expense { color: var(--danger); }
 
@@ -290,43 +263,40 @@ button.danger{ background:var(--danger); }
 .delete-btn:hover, .edit-btn:hover { opacity: 1; transform: scale(1.1); }
 
 /* ========================================= */
-/* CHARTS & EXPORT                     */
+/* 7. CHARTS & EXPORT                  */
 /* ========================================= */
-.analytics{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
-.chart-card{ flex:1 1 320px; min-height:220px; background:#fff; border-radius:10px; padding:10px; box-shadow: 0 8px 22px rgba(18,30,40,0.04); }
+.analytics{ display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.chart-card{ flex: 1 1 320px; min-height: 220px; background: #fff; border-radius: 10px; padding: 10px; box-shadow: 0 8px 22px rgba(18,30,40,0.04); }
 
-.export-row{ display:flex; gap:10px; margin-top:12px; justify-content:flex-end; }
-.export-row button{ background:#f4f6f7; color:var(--accent-2); border:1px solid rgba(18,30,40,0.04); padding:10px 12px; }
-.export-row button#clear-all{ background:var(--danger); color:#fff; border:none; }
+.export-row{ display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+.export-row button{ background: #f4f6f7; color: var(--accent-2); border: 1px solid rgba(18,30,40,0.04); padding: 10px 12px; }
+.export-row button#clear-all{ background: var(--danger); color: #fff; border: none; }
 
 /* Sidebar & Utility */
-.members{ list-style:none; padding-left:6px; text-align:left; }
-.small-note{ font-size:13px; color:var(--muted); margin-top:8px; }
-.muted{ color:var(--muted); }
+.members{ list-style: none; padding-left: 6px; text-align: left; }
+.small-note{ font-size: 13px; color: var(--muted); margin-top: 8px; }
+.muted{ color: var(--muted); }
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 /* ========================================= */
-/* PDF PRINT STYLES                    */
+/* 8. DATE INPUT FIX (Placeholder Trick) */
 /* ========================================= */
-.printing {
-  background: white !important; padding: 20px !important; font-family: 'Poppins', sans-serif !important;
+input[type="date"]:invalid::-webkit-datetime-edit { color: transparent; }
+input[type="date"]:invalid::before {
+  content: attr(placeholder);
+  color: #6c7a86;
+  margin-right: 5px;
 }
-.printing .delete-btn, .printing .edit-btn, .printing .export-row, .printing .small-note { display: none !important; }
-.printing .tx-desc { color: #000 !important; font-weight: 800 !important; font-size: 14px !important; }
-.printing .tx-meta { color: #444 !important; font-weight: 600 !important; }
-.printing h4 { color: #000 !important; }
-.printing .value-income, .printing .tx-amount.income { color: #2ea44f !important; font-weight: 800 !important; }
-.printing .value-expense, .printing .tx-amount.expense { color: #e63946 !important; font-weight: 800 !important; }
-.printing #list li { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; break-inside: avoid; }
-.printing .chart-card { box-shadow: none; border: 1px solid #ddd; height: 300px !important; page-break-inside: avoid; }
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer; opacity: 0.6; transition: 0.3s;
+}
+input[type="date"]:hover::-webkit-calendar-picker-indicator { opacity: 1; }
 
 /* ========================================= */
-/* DARK MODE                           */
+/* 9. DARK MODE STYLES                 */
 /* ========================================= */
-.header-row {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-}
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .theme-btn { background: #264653; font-size: 12px; padding: 8px 12px; }
 
 body.dark-mode { background: #121212; color: #e0e0e0; }
@@ -340,44 +310,55 @@ body.dark-mode .muted, body.dark-mode .tx-meta { color: #aaaaaa; }
 body.dark-mode #list li { background: #2d2d2d; border: 1px solid #333; }
 body.dark-mode #list li:hover { background: #383838; }
 body.dark-mode .chart-card canvas { filter: brightness(0.9); }
-
-/* Dark Mode Date Fixes */
-body.dark-mode input[type="date"]:invalid::before {
-  color: #aaaaaa;
-}
-body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* Makes the calendar icon white */
-}
+body.dark-mode input[type="date"]:invalid::before { color: #aaaaaa; }
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
 /* ========================================= */
-/* MOBILE OPTIMIZATIONS                */
+/* 10. PDF PRINT STYLES                */
+/* ========================================= */
+.printing { background: white !important; padding: 20px !important; font-family: 'Poppins', sans-serif !important; }
+.printing .delete-btn, .printing .edit-btn, .printing .export-row, .printing .small-note { display: none !important; }
+.printing .tx-desc { color: #000 !important; font-weight: 800 !important; font-size: 14px !important; }
+.printing .tx-meta { color: #444 !important; font-weight: 600 !important; }
+.printing h4 { color: #000 !important; }
+.printing .value-income, .printing .tx-amount.income { color: #2ea44f !important; font-weight: 800 !important; }
+.printing .value-expense, .printing .tx-amount.expense { color: #e63946 !important; font-weight: 800 !important; }
+.printing #list li { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; break-inside: avoid; }
+.printing .chart-card { box-shadow: none; border: 1px solid #ddd; height: 300px !important; page-break-inside: avoid; }
+
+/* ========================================= */
+/* 11. MOBILE OPTIMIZATIONS            */
 /* ========================================= */
 @media (max-width: 980px){
   .page{ flex-direction: column; align-items: center; gap: 15px; }
-  .panel, .container{ width: 100%; max-width: 100%; }
+  .panel{ 
+    width: 100%; 
+    max-width: 100%; 
+    flex: 0 0 auto; /* FIX: Removes fixed height on mobile sidebars */
+  }
+  .container{ width: 100%; max-width: 100%; }
 }
 
 @media (max-width: 768px){
-  /* 1. Reduce empty space on phone sides */
   body { padding: 10px; }
   
-  /* 2. Header Layout */
+  /* Header */
   .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
   .header-row h1 { font-size: 22px; line-height: 1.2; margin-right: auto; margin-bottom: 0; }
   .theme-btn { white-space: nowrap; padding: 8px 12px; font-size: 12px; flex-shrink: 0; height: auto; width: auto; }
   
-  /* 3. Summary Cards Grid */
+  /* Grid Layouts */
   .balance-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .card:first-child { grid-column: 1 / -1; background: #f8fcfd; }
   .card { flex: none; padding: 12px; }
   .card h4 { font-size: 12px; }
   .card .value { font-size: 20px; }
 
-  /* 4. Form Inputs Stacking */
+  /* Stacking Inputs */
   .row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
   .row > div { width: 100%; min-width: auto; }
   
-  /* 5. Filter Actions Stacking */
+  /* Stacking Actions */
   .form-actions, .filter-actions { flex-direction: column; }
   .form-actions button, .filter-actions button { width: 100%; padding: 12px; }
   

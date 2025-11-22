@@ -1,5 +1,6 @@
-// script.js - Expense tracker logic
+// Student's Expense Tracker - Core Logic
 
+// 1. Select DOM Elements
 const txForm = document.getElementById('tx-form');
 const descriptionEl = document.getElementById('description');
 const amountEl = document.getElementById('amount');
@@ -27,22 +28,27 @@ const resetBtn = document.getElementById('reset-btn');
 let pieChart = null;
 let lineChart = null;
 
+// 2. Category Configuration
 const categories = {
   expense: ['Food', 'Travel', 'Books', 'Stationery', 'Entertainment', 'General', 'Other'],
   income: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
 };
 
+// 3. Initialize Data
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
+// Set default date to today
 if (!dateEl.value) {
   const today = new Date().toISOString().slice(0,10);
   dateEl.value = today;
 }
 
+// Helper: Format Currency
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
 }
 
+// Helper: Save to LocalStorage
 function saveTransactions() {
   localStorage.setItem('transactions', JSON.stringify(transactions));
 }
@@ -51,6 +57,7 @@ function generateId() {
   return Math.floor(Math.random() * 10000000);
 }
 
+// 4. Add Transaction Logic
 function addTransaction(e) {
   e.preventDefault();
   const description = descriptionEl.value.trim();
@@ -73,12 +80,14 @@ function addTransaction(e) {
   updateCategoryOptions();
 }
 
+// 5. Delete Transaction
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
   saveTransactions();
   renderTransactions();
 }
 
+// 6. Edit Transaction Logic
 let isEditing = false;
 let editingId = null;
 
@@ -127,6 +136,7 @@ function updateTransaction() {
   }
 }
 
+// 7. Render List & Update UI
 function renderTransactions(txs = transactions) {
   listEl.innerHTML = '';
   if (txs.length === 0) {
@@ -173,6 +183,7 @@ function updateBalance() {
   balanceEl.className = total < 0 ? 'value value-expense' : 'value value-income';
 }
 
+// 8. Chart Logic
 function updateCharts() {
   const expenseItems = transactions.filter(t => t.type === 'expense');
   const catMap = {};
@@ -241,6 +252,7 @@ function updateCategoryOptions() {
   });
 }
 
+// 9. Filters & Exports
 function applyFilters() {
   const sText = document.getElementById('search-text').value.toLowerCase();
   const cat = filterCategory.value;
@@ -311,6 +323,7 @@ resetBtn.addEventListener('click', () => {
   updateCategoryOptions(); 
 });
 
+// 10. Event Listeners
 applyFiltersBtn.addEventListener('click', applyFilters);
 clearFiltersBtn.addEventListener('click', clearFilters);
 exportCsvBtn.addEventListener('click', exportToCsv);
@@ -319,7 +332,7 @@ clearAllBtn.addEventListener('click', clearAllData);
 typeEl.addEventListener('change', updateCategoryOptions);
 document.getElementById('search-text').addEventListener('input', applyFilters);
 
-// Dark Mode
+// Dark Mode Logic
 const themeBtn = document.getElementById('theme-toggle');
 if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); themeBtn.textContent = '☀️ Light Mode'; }
 themeBtn.addEventListener('click', () => {
@@ -328,5 +341,6 @@ themeBtn.addEventListener('click', () => {
   themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
 });
 
+// Initial Load
 updateCategoryOptions();
 renderTransactions();
