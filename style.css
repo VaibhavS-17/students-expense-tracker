@@ -436,3 +436,31 @@ body.dark-mode .toast {
 @keyframes fadeOut {
   to { opacity: 0; pointer-events: none; }
 }
+
+/* --- iPHONE SPECIFIC FIXES --- */
+
+/* 1. Stop the "Zoom" & Overflow Glitch */
+/* Forces 16px font on mobile so iOS doesn't zoom in and break the layout */
+@media (max-width: 768px) {
+  .row input, .row select, 
+  .filter-group input, .filter-group select {
+    font-size: 16px !important; 
+    max-width: 100%; /* Ensures it never goes "out of box" */
+  }
+}
+
+/* 2. Flatten the iOS Style (Removes the default "Bubble" look) */
+input[type="date"],
+input[type="text"],
+input[type="number"],
+select {
+  -webkit-appearance: none; /* Removes iOS default rounded styling */
+  appearance: none;
+  border-radius: 6px; /* Enforces YOUR radius, not Apple's */
+}
+
+/* 3. Fix the Date Picker Indicator Position */
+input[type="date"] {
+  min-height: 42px; /* Ensures tap target is big enough */
+  background-color: #fff; /* Fixes transparent background glitches */
+}
