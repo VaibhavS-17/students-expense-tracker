@@ -1,5 +1,34 @@
 // Student's Expense Tracker - Core Logic
 
+function escapeHtml(text) {
+  if (!text) return text;
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// --- TOAST NOTIFICATION SYSTEM ---
+const toastContainer = document.createElement('div');
+toastContainer.id = 'toast-container';
+document.body.appendChild(toastContainer);
+
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  // Choose icon based on type
+  let icon = 'ℹ️';
+  if (type === 'success') icon = '✅';
+  if (type === 'error') icon = '⚠️';
+  
+  toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+  toastContainer.appendChild(toast);
+
+  // Remove element from DOM after animation ends (3.5 seconds)
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
+}
+
 // 1. Select DOM Elements
 const txForm = document.getElementById('tx-form');
 const descriptionEl = document.getElementById('description');
@@ -66,8 +95,10 @@ function addTransaction(e) {
   const date = dateEl.value;
   const type = typeEl.value;
 
+  // Validation Check
   if (description === '' || isNaN(amount) || amount <= 0 || category === '') {
-    alert('Please enter a valid description, amount, and category.');
+    // UPGRADE: Use Toast instead of Alert
+    showToast('Please fill in all fields correctly!', 'error');
     return;
   }
 
@@ -76,8 +107,11 @@ function addTransaction(e) {
   saveTransactions();
   renderTransactions();
   txForm.reset();
-  dateEl.value = new Date().toISOString().slice(0,10); 
+  dateEl.value = new Date().toLocaleDateString('en-CA'); 
   updateCategoryOptions();
+  
+  // UPGRADE: Show Success Message
+  showToast('Transaction added successfully!', 'success');
 }
 
 // 5. Delete Transaction
@@ -149,7 +183,7 @@ function renderTransactions(txs = transactions) {
     li.innerHTML = `
       <div class="tx-left">
           <div class="tx-details">
-              <span class="tx-desc">${t.description}</span>
+              <span class="tx-desc">${escapeHtml(t.description)}</span>
               <div class="tx-meta">
                   <span>${t.category}</span>
                   <span>|</span>
@@ -181,6 +215,37 @@ function updateBalance() {
   expenseEl.className = 'value value-expense';
   balanceEl.textContent = formatCurrency(total);
   balanceEl.className = total < 0 ? 'value value-expense' : 'value value-income';
+    // --- START NEW BUDGET LOGIC ---
+  let budgetLimit = Number(localStorage.getItem('budgetLimit')) || 0;
+  const budgetBar = document.getElementById('budget-bar');
+  const budgetText = document.getElementById('budget-text');
+  const budgetVal = document.getElementById('budget-val');
+
+  if (budgetLimit > 0) {
+    const percent = Math.min((expense / budgetLimit) * 100, 100);
+    budgetBar.style.width = `${percent}%`;
+    budgetVal.textContent = `Limit: ${formatCurrency(budgetLimit)}`;
+    
+    if (expense > budgetLimit) {
+      budgetBar.style.backgroundColor = '#e63946'; // Red (Danger)
+      budgetText.innerHTML = `⚠️ Over Budget! (${Math.round((expense/budgetLimit)*100)}%)`;
+      budgetText.style.color = '#e63946';
+    } else if (percent > 80) {
+      budgetBar.style.backgroundColor = '#e9c46a'; // Yellow (Warning)
+      budgetText.innerHTML = `⚠️ Warning: ${Math.round(percent)}% Used`;
+      budgetText.style.color = '#e9c46a';
+    } else {
+      budgetBar.style.backgroundColor = '#2a9d8f'; // Teal (Safe)
+      budgetText.innerHTML = `Spending: ${Math.round(percent)}%`;
+      budgetText.style.color = 'var(--muted)';
+    }
+  } else {
+    budgetBar.style.width = '0%';
+    budgetBar.style.backgroundColor = '#e0e0e0'; // Grey out the bar
+    budgetText.innerHTML = "<i>No monthly limit set</i>"; // Use italics for style
+    budgetVal.textContent = ""; // Hide the "Limit: ₹0" text to reduce clutter
+  }
+  // --- END NEW BUDGET LOGIC ---
 }
 
 // 8. Chart Logic
@@ -279,14 +344,30 @@ function clearFilters() {
 }
 
 function exportToCsv() {
-  if (!transactions.length) { alert('No data to export'); return; }
+  if (!transactions.length) { 
+    // UPGRADE: Use Toast
+    showToast('No data available to export!', 'error'); 
+    return; 
+  }
+  
   const header = ['id','date','description','category','type','amount'];
-  const rows = transactions.map(t => [t.id, t.date, `"${t.description.replace(/"/g,'""')}"`, t.category, t.type, t.amount]);
+  const rows = transactions.map(t => [
+    t.id, 
+    t.date, 
+    `"${t.description.replace(/"/g,'""')}"`, 
+    t.category, 
+    t.type, 
+    t.amount
+  ]);
   const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
   const a = document.createElement('a');
-  a.href = url; a.download = `expense_tracker_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url; 
+  a.download = `expense_tracker_${new Date().toLocaleDateString('en-CA')}.csv`;
   a.click();
+  
+  // UPGRADE: Show Success Message
+  showToast('CSV file downloaded!', 'success');
 }
 
 function downloadPdf() {
@@ -312,7 +393,13 @@ function downloadPdf() {
 }
 
 function clearAllData() {
-  if (confirm('Clear ALL data?')) { transactions = []; saveTransactions(); renderTransactions(); }
+  if (confirm('Are you sure you want to Clear ALL data? This cannot be undone.')) { 
+    transactions = []; 
+    saveTransactions(); 
+    renderTransactions(); 
+    // UPGRADE: Show Success Message
+    showToast('All data has been cleared.', 'info');
+  }
 }
 
 resetBtn.addEventListener('click', () => { 
@@ -344,3 +431,17 @@ themeBtn.addEventListener('click', () => {
 // Initial Load
 updateCategoryOptions();
 renderTransactions();
+
+// Budget Setting Event Listener
+document.getElementById('set-budget-btn').addEventListener('click', () => {
+  const currentLimit = localStorage.getItem('budgetLimit') || 0;
+  const input = prompt("Enter your monthly budget limit (₹):", currentLimit);
+  
+  if (input !== null && !isNaN(input) && Number(input) > 0) {
+    localStorage.setItem('budgetLimit', input);
+    updateBalance(); // Refresh the bar immediately
+    showToast(`Budget limit set to ₹${input}`, 'success');
+  } else if (input !== null) {
+    showToast('Please enter a valid number!', 'error');
+  }
+});

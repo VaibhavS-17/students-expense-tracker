@@ -323,6 +323,7 @@ body.dark-mode #list li:hover { background: #383838; }
 body.dark-mode .chart-card canvas { filter: brightness(0.9); }
 body.dark-mode input[type="date"]:invalid::before { color: #aaaaaa; }
 body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+body.dark-mode .small-note { color: #bbb; }
 
 /* ========================================= */
 /* 10. PDF PRINT STYLES                */
@@ -379,4 +380,56 @@ body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator { filter: i
   .tx-left { flex-direction: column; align-items: flex-start; gap: 2px; }
   .tx-meta { font-size: 11px; }
   #list li { padding: 10px; }
+}
+
+/* ========================================= */
+/* 12. TOAST NOTIFICATIONS (Added Upgrade)   */
+/* ========================================= */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 280px;
+  padding: 16px 20px;
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  border-left: 6px solid #333;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  
+  /* Animations */
+  animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+             fadeOut 0.5s ease 3s forwards;
+}
+
+/* Toast Types */
+.toast.success { border-left-color: #2ea44f; } /* Green */
+.toast.error { border-left-color: #e63946; }   /* Red */
+.toast.info { border-left-color: #2a9d8f; }    /* Teal */
+
+/* Dark Mode Support for Toasts */
+body.dark-mode .toast {
+  background: #2d2d2d;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  to { opacity: 0; pointer-events: none; }
 }

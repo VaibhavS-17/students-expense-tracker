@@ -43,6 +43,22 @@
         </div>
       </div>
 
+<div class="card" style="margin-bottom: 20px; text-align: left; padding: 15px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+    <h4 style="margin:0;">Monthly Budget Goal</h4>
+    <button id="set-budget-btn" style="padding:4px 10px; font-size:12px;">Set Limit</button>
+  </div>
+  
+  <div style="background:#e0e0e0; border-radius:20px; height:18px; width:100%; overflow:hidden; position:relative;">
+    <div id="budget-bar" style="background:var(--accent); height:100%; width:0%; transition: width 0.6s ease, background-color 0.4s ease;"></div>
+  </div>
+  
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+    <p id="budget-text" class="small-note" style="margin:0; font-weight:600;">Spending: 0%</p>
+    <p id="budget-val" class="small-note" style="margin:0;">Limit: ₹0</p>
+  </div>
+</div>
+
       <div class="form-card">
         <form id="tx-form">
             <h3>Add New Transaction</h3>
