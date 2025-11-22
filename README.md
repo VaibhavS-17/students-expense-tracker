@@ -13,23 +13,23 @@ A responsive web application designed to help students track their daily income 
 * **Filtering:** Filter transactions by category, date range, or search description.
 * **Export Options:** Download reports as **PDF** (mobile-friendly) or **CSV** files.
 * **Mobile Responsive:** Optimized for usage on mobile devices and desktops.
+* **Security:** Implemented input sanitization to prevent XSS attacks.
 
 ## 🛠️ Tech Stack
 
 * **HTML5** - Structure
 * **CSS3** - Styling (Custom Responsive Design & Animations)
-* **JavaScript (ES6)** - Logic & DOM Manipulation
+* **JavaScript (ES6)** - Logic, DOM Manipulation & Security
 * **Chart.js** - Data Visualization
 * **html2pdf.js** - PDF Generation
 
-## 📂 Directory Structure
+## 📂 Project Structure
 
-students-expense-tracker/
-├── index.html       # Main HTML structure
-├── style.css        # CSS with Dark Mode & Print variables
-├── script.js        # Logic (Chart.js, DOM manipulation, LocalStorage)
-└── README.md        # Documentation
-
+    students-expense-tracker/
+    ├── index.html       # Main HTML structure
+    ├── style.css        # CSS with Dark Mode & Print variables
+    ├── script.js        # Core Logic (Charts, CRUD, Security)
+    └── README.md        # Project Documentation
 
 ## 💻 How to Run Locally
 
@@ -39,10 +39,12 @@ To run this project on your local machine:
     ```bash
     git clone [https://github.com/VaibhavS-17/students-expense-tracker.git](https://github.com/VaibhavS-17/students-expense-tracker.git)
     ```
+
 2.  **Navigate to the project folder:**
     ```bash
     cd students-expense-tracker
     ```
+
 3.  **Open `index.html`** in your browser.
 
 ## 👥 Project Members
