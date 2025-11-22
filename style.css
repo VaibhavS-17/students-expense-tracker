@@ -1,4 +1,4 @@
-/* style.css - Final Version (Desktop & Mobile Optimized) */
+/* style.css - Final Version */
 
 /* Google font loaded in HTML */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,8 +22,7 @@ body{
   background: linear-gradient(180deg, #eef6f9, #f7fbfc);
   color: #122023;
   min-height: 100vh;
-  /* DESKTOP DEFAULT: Nice wide padding */
-  padding: 28px;
+  padding: 28px; /* Desktop default */
   -webkit-font-smoothing:antialiased;
 }
 
@@ -97,11 +96,8 @@ body{
   font-weight:700;
   color:var(--accent-2);
 }
-
-/* Specific colors for summary values */
 .card .value-income { color: #2ea44f; }
 .card .value-expense { color: var(--danger); }
-
 
 /* form styles */
 .form-card, .filter-card{
@@ -122,13 +118,10 @@ body{
   margin-bottom:15px;
   align-items:flex-end;
 }
-
-/* inner divs to control layout */
 .row > div {
   flex: 1 1 0; 
   min-width: 120px;
 }
-
 .row label{
   display:block;
   font-size:14px;
@@ -156,64 +149,28 @@ body{
   outline: none;
 }
 
-
-/* Form actions */
 .form-actions{
   margin-top:20px;
   justify-content:flex-end;
 }
-.form-actions button{
-  flex:0 0 auto;
-}
+.form-actions button{ flex:0 0 auto; }
 
-/* buttons */
-button{
-  padding:10px 15px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:600;
-  transition:background 0.2s;
-  background:var(--accent);
-  color:#fff;
-  font-family:'Poppins', sans-serif;
-}
-button:active {
-  transform: scale(0.98);
-}
-button:hover{
-  background:var(--accent-2);
-}
-button.secondary{
-  background:#f4f6f7;
-  color:var(--accent-2);
-}
-button.secondary:hover{
-  background:#e5e9ec;
-}
-button.danger{
-  background:var(--danger);
-}
-
-/* ---- UPDATED FILTER STYLES ---- */
-
+/* ---- UPDATED FILTER STYLES (Matches Form) ---- */
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px; /* Increased gap to match form rows */
-  align-items: flex-start; /* Aligns labels to top */
+  gap: 15px; /* Spacing between inputs */
+  align-items: flex-start;
 }
 
-/* This class mimics the ".row > div" style from the top form */
 .filter-group {
-  flex: 1 1 200px; /* Allows them to sit side-by-side on PC, stack on mobile */
+  flex: 1 1 200px; /* Allows stacking on mobile */
   display: flex;
   flex-direction: column;
   gap: 5px;
   width: 100%;
 }
 
-/* Exact label styling from the top form */
 .filter-group label {
   font-size: 14px;
   color: var(--accent-2);
@@ -221,7 +178,6 @@ button.danger{
   margin-left: 2px;
 }
 
-/* Input styling ensuring full width */
 .filter-group input, 
 .filter-group select {
   width: 100%;
@@ -233,7 +189,6 @@ button.danger{
   color: #122023;
 }
 
-/* Filter Buttons Area */
 .filter-actions {
   width: 100%;
   display: flex;
@@ -241,35 +196,25 @@ button.danger{
   margin-top: 10px;
   justify-content: flex-end;
 }
+.filters button{ white-space:nowrap; }
 
-/* Mobile Tweaks for Filters */
-@media (max-width: 768px) {
-  .filter-actions {
-    flex-direction: column; /* Stack buttons on phone */
-  }
-  .filter-actions button {
-    width: 100%;
-    padding: 12px;
-  }
+/* buttons generic */
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+  transition:background 0.2s;
+  background:var(--accent);
+  color:#fff;
+  font-family:'Poppins', sans-serif;
 }
-
-
-/* ---- FIX FOR FILTER DATE LABELS (GLOBAL) ---- */
-/* Placed here so it works on PC and Mobile */
-.filter-date-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex: 1 1 120px; 
-  width: 100%; 
-}
-
-.filter-date-group label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-2);
-  margin-left: 2px;
-}
+button:active { transform: scale(0.98); }
+button:hover{ background:var(--accent-2); }
+button.secondary{ background:#f4f6f7; color:var(--accent-2); }
+button.secondary:hover{ background:#e5e9ec; }
+button.danger{ background:var(--danger); }
 
 /* transaction list */
 .history{ margin-top:20px; }
@@ -279,7 +224,6 @@ button.danger{
   color:var(--accent-2);
 }
 
-/* Animation Definition */
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -310,279 +254,93 @@ button.danger{
 .tx-meta{ font-size:13px; color:var(--muted); }
 .tx-amount{ font-weight:700; }
 
-/* chart layout */
 .analytics{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
 .chart-card{ flex:1 1 320px; min-height:220px; background:#fff; border-radius:10px; padding:10px; box-shadow: 0 8px 22px rgba(18,30,40,0.04); }
 
-/* export row */
 .export-row{ display:flex; gap:10px; margin-top:12px; justify-content:flex-end; }
 .export-row button{ background:#f4f6f7; color:var(--accent-2); border:1px solid rgba(18,30,40,0.04); padding:10px 12px; }
 .export-row button#clear-all{ background:var(--danger); color:#fff; border:none; }
 
-/* right panel members */
 .members{ list-style:none; padding-left:6px; text-align:left; }
-
-/* small text */
 .small-note{ font-size:13px; color:var(--muted); margin-top:8px; }
 .muted{ color:var(--muted); }
 
-/* Button Styles */
-.delete-btn {
-  background: none;
-  border: none;
-  padding: 0 4px;
-  font-size: 14px;
-  color: var(--danger);
-  font-weight: 700;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+.delete-btn, .edit-btn {
+  background: none; border: none; padding: 0 4px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.7;
 }
-.delete-btn:hover { opacity: 1; transform: scale(1.1); }
-
-.edit-btn {
-  background: none;
-  border: none;
-  padding: 0 4px;
-  font-size: 14px;
-  color: var(--accent);
-  font-weight: 700;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-.edit-btn:hover { opacity: 1; transform: scale(1.1); }
-
+.delete-btn{ color: var(--danger); }
+.edit-btn{ color: var(--accent); }
+.delete-btn:hover, .edit-btn:hover { opacity: 1; transform: scale(1.1); }
 #list .tx-amount.income { color: #2ea44f; }
 #list .tx-amount.expense { color: var(--danger); }
 
-/* Remove up/down arrows from number inputs */
 input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
-}
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* ========================================= */
-/* PDF PRINT STYLES                */
-/* ========================================= */
+/* PDF PRINT STYLES */
 .printing {
-  background: white !important;
-  padding: 20px !important;
-  font-family: 'Poppins', sans-serif !important;
+  background: white !important; padding: 20px !important; font-family: 'Poppins', sans-serif !important;
 }
-.printing .delete-btn, 
-.printing .edit-btn,
-.printing .export-row,
-.printing .small-note { display: none !important; }
-
-.printing .tx-desc {
-  color: #000 !important; 
-  font-weight: 800 !important;
-  font-size: 14px !important;
-}
-.printing .tx-meta {
-  color: #444 !important; 
-  font-weight: 600 !important;
-}
+.printing .delete-btn, .printing .edit-btn, .printing .export-row, .printing .small-note { display: none !important; }
+.printing .tx-desc { color: #000 !important; font-weight: 800 !important; font-size: 14px !important; }
+.printing .tx-meta { color: #444 !important; font-weight: 600 !important; }
 .printing h4 { color: #000 !important; }
+.printing .value-income, .printing .tx-amount.income { color: #2ea44f !important; font-weight: 800 !important; }
+.printing .value-expense, .printing .tx-amount.expense { color: #e63946 !important; font-weight: 800 !important; }
+.printing #list li { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; break-inside: avoid; }
+.printing .chart-card { box-shadow: none; border: 1px solid #ddd; height: 300px !important; page-break-inside: avoid; }
 
-.printing .value-income, .printing .tx-amount.income {
-  color: #2ea44f !important; 
-  font-weight: 800 !important;
-}
-
-.printing .value-expense, .printing .tx-amount.expense {
-  color: #e63946 !important; 
-  font-weight: 800 !important;
-}
-
-.printing #list li {
-  box-shadow: none;
-  border: 1px solid #ddd;
-  margin-bottom: 5px;
-  break-inside: avoid;
-}
-.printing .chart-card {
-  box-shadow: none;
-  border: 1px solid #ddd;
-  height: 300px !important;
-  page-break-inside: avoid;
-}
-
-/* ========================================= */
-/* DARK MODE STYLES                */
-/* ========================================= */
-
+/* DARK MODE */
 .header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
 }
-.theme-btn {
-  background: #264653;
-  font-size: 12px;
-  padding: 8px 12px;
-}
+.theme-btn { background: #264653; font-size: 12px; padding: 8px 12px; }
 
-body.dark-mode {
-  background: #121212; 
-  color: #e0e0e0;
+body.dark-mode { background: #121212; color: #e0e0e0; }
+body.dark-mode .card, body.dark-mode .form-card, body.dark-mode .filter-card,
+body.dark-mode .chart-card, body.dark-mode .panel {
+  background: #1e1e1e; color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
-body.dark-mode .card, 
-body.dark-mode .form-card, 
-body.dark-mode .filter-card,
-body.dark-mode .chart-card,
-body.dark-mode .panel {
-  background: #1e1e1e;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-body.dark-mode input, 
-body.dark-mode select {
-  background: #2d2d2d;
-  border-color: #444;
-  color: #fff;
-}
-body.dark-mode h1, 
-body.dark-mode h2, 
-body.dark-mode h3,
-body.dark-mode label,
-body.dark-mode .tx-desc {
-  color: #ffffff;
-}
-body.dark-mode .muted,
-body.dark-mode .tx-meta {
-  color: #aaaaaa;
-}
-body.dark-mode #list li {
-  background: #2d2d2d;
-  border: 1px solid #333;
-}
-body.dark-mode #list li:hover {
-  background: #383838;
-}
-body.dark-mode .chart-card canvas {
-  filter: brightness(0.9);
-}
+body.dark-mode input, body.dark-mode select { background: #2d2d2d; border-color: #444; color: #fff; }
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode label, body.dark-mode .tx-desc { color: #ffffff; }
+body.dark-mode .muted, body.dark-mode .tx-meta { color: #aaaaaa; }
+body.dark-mode #list li { background: #2d2d2d; border: 1px solid #333; }
+body.dark-mode #list li:hover { background: #383838; }
+body.dark-mode .chart-card canvas { filter: brightness(0.9); }
 
-/* ========================================= */
-/* RESPONSIVE / MOBILE OPTIMIZATIONS    */
-/* ========================================= */
-
-/* TABLET View (Stack columns, but keep padding) */
+/* RESPONSIVE / MOBILE OPTIMIZATIONS */
 @media (max-width: 980px){
-  .page{ 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 15px; 
-  }
-  .panel{ width: 100%; max-width: 100%; }
-  .container{ width: 100%; max-width: 100%; }
+  .page{ flex-direction: column; align-items: center; gap: 15px; }
+  .panel, .container{ width: 100%; max-width: 100%; }
 }
 
-/* MOBILE View (Phones only) */
 @media (max-width: 768px){
+  body { padding: 10px; }
   
-  /* 0. CRITICAL FIX: Reduce Side Empty Space for Mobile Only */
-  body {
-    padding: 10px; /* Overrides the 28px from Desktop */
-  }
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+  .header-row h1 { font-size: 22px; line-height: 1.2; margin-right: auto; margin-bottom: 0; }
+  .theme-btn { white-space: nowrap; padding: 8px 12px; font-size: 12px; flex-shrink: 0; height: auto; width: auto; }
   
-  /* 1. Header Layout Fix */
-  .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* This vertically centers the button */
-    margin-bottom: 15px;
-    gap: 10px; /* Adds space between title and button */
-  }
-  
-  .header-row h1 {
-    font-size: 22px; /* Optimized size for mobile */
-    line-height: 1.2;
-    margin-right: auto; 
-    margin-bottom: 0; /* Remove bottom margin so it aligns with button */
-  }
-
-  /* Fix for the Button */
-  .theme-btn {
-    white-space: nowrap; /* Forces "Dark Mode" to stay on one line */
-    padding: 8px 12px;   /* Compact padding */
-    font-size: 12px;     
-    flex-shrink: 0;      /* Prevents the button from being squished */
-    height: auto;        /* Prevents stretching */
-    width: auto;
-  }
-  
-  /* 2. Compact Summary Cards (Grid Layout) */
-  .balance-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px; 
-  }
-  .card:first-child {
-    grid-column: 1 / -1; 
-    background: #f8fcfd;
-  }
+  .balance-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .card:first-child { grid-column: 1 / -1; background: #f8fcfd; }
   .card { flex: none; padding: 12px; }
   .card h4 { font-size: 12px; }
   .card .value { font-size: 20px; }
 
-  /* 3. Form Inputs */
-  .row {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .row > div {
-    width: 100%; 
-    min-width: auto;
-  }
+  .row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+  .row > div { width: 100%; min-width: auto; }
   
-  .form-actions {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .form-actions button {
-    width: 100%;
-    padding: 12px; 
-  }
+  .form-actions { flex-direction: column; gap: 10px; margin-top: 10px; }
+  .form-actions button { width: 100%; padding: 12px; }
 
-  /* 4. Filter Section */
-  .filters {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  /* Filter Mobile Tweaks */
+  .filter-actions { flex-direction: column; }
+  .filter-actions button { width: 100%; padding: 12px; }
   
-  .filters input, .filters select, .filters button {
-    width: 100%;
-    flex: none; 
-    height: auto; 
-    padding: 10px 12px; 
-  }
-
-  /* 5. General Spacing */
   .form-card, .filter-card { padding: 15px; }
+  .chart-card { height: 220px; width: 100%; flex: 1 1 100%; min-width: 0; }
   
-  /* 6. Compact Charts */
-  .chart-card {
-    height: 220px; 
-    width: 100%;      
-    flex: 1 1 100%;   
-    min-width: 0;     
-  }
-  
-  /* 7. Transaction List */
-  .tx-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
+  .tx-left { flex-direction: column; align-items: flex-start; gap: 2px; }
   .tx-meta { font-size: 11px; }
   #list li { padding: 10px; }
 }
