@@ -166,13 +166,12 @@ body{
 
 /* Bottom Filter Layout */
 .filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px; 
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Creates exactly 2 equal columns */
+  gap: 15px;
+  align-items: start;
 }
 .filter-group {
-  flex: 1 1 200px; 
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -186,12 +185,12 @@ body{
 }
 
 /* Button Containers */
-.form-actions, .filter-actions{
-  margin-top: 20px;
+.form-actions, .filter-actions {
+  grid-column: 1 / -1; /* Spans from first column to the last */
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end; /* Pushes buttons to the right */
   gap: 10px;
-  width: 100%;
+  margin-top: 10px;
 }
 .form-actions button, .filter-actions button{ flex: 0 0 auto; white-space: nowrap; }
 
@@ -463,4 +462,11 @@ select {
 input[type="date"] {
   min-height: 42px; /* Ensures tap target is big enough */
   background-color: #fff; /* Fixes transparent background glitches */
+}
+
+/* IMPORTANT: Keep it 1 column on mobile phones so it doesn't look squished */
+@media (max-width: 768px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
 }
