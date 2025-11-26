@@ -53,7 +53,6 @@ To run this project on your local machine:
 * **Cloud Sync:** Moving from LocalStorage to a database (MongoDB/MySQL) for cross-device syncing.
 * **Budget Alerts:** Sending email or SMS notifications when the budget limit is exceeded.
 * **OCR Scanning:** Scanning receipts to automatically add transactions.
-* 
 
 ## 👥 Project Members
 
