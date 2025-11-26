@@ -47,6 +47,14 @@ To run this project on your local machine:
 
 3.  **Open `index.html`** in your browser.
 
+## 🔮 Future Scope
+
+* **User Authentication:** Implementing Login/Signup (Firebase/Auth0) to support multiple users.
+* **Cloud Sync:** Moving from LocalStorage to a database (MongoDB/MySQL) for cross-device syncing.
+* **Budget Alerts:** Sending email or SMS notifications when the budget limit is exceeded.
+* **OCR Scanning:** Scanning receipts to automatically add transactions.
+* 
+
 ## 👥 Project Members
 
 **Rajiv Gandhi Institute of Technology**
