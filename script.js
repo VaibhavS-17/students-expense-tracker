@@ -1,5 +1,6 @@
-// Student's Expense Tracker - Core Logic (UPDATED)
+// Student's Expense Tracker - Core Logic
 
+// Helper: Sanitize Input to prevent XSS
 function escapeHtml(text) {
   if (!text) return text;
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -61,23 +62,23 @@ const categories = {
   income: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
 };
 
-// 3. Initialize Data (UPDATED: Safer Parsing)
+// 3. Initialize Data
 let transactions = [];
 try {
   const localData = localStorage.getItem('transactions');
   transactions = localData ? JSON.parse(localData) : [];
 } catch (error) {
   console.error("Error parsing local storage data", error);
-  transactions = []; // Fallback to empty if corrupted
+  transactions = [];
 }
 
 // Set default date to today
 if (!dateEl.value) {
-  const today = new Date().toISOString().slice(0,10);
+  const today = new Date().toISOString().slice(0, 10);
   dateEl.value = today;
 }
 
-// Helper: Format Currency (UPDATED: Math.abs to prevent -0)
+// Helper: Format Currency
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Math.abs(amount));
 }
@@ -132,12 +133,14 @@ function editTransaction(id) {
   if (!transaction) return;
   isEditing = true;
   editingId = id;
+  
   descriptionEl.value = transaction.description;
   amountEl.value = transaction.amount;
   typeEl.value = transaction.type;
   dateEl.value = transaction.date;
   updateCategoryOptions();
   categoryEl.value = transaction.category;
+  
   document.getElementById('add-btn').textContent = 'Update Transaction';
   document.getElementById('add-btn').classList.add('secondary');
   descriptionEl.focus();
@@ -160,33 +163,37 @@ function updateTransaction() {
     transactions[index].category = categoryEl.value;
     transactions[index].date = dateEl.value;
     transactions[index].type = typeEl.value;
+    
     saveTransactions();
     renderTransactions();
+    
     isEditing = false;
     editingId = null;
     txForm.reset();
     document.getElementById('add-btn').textContent = 'Add Transaction';
     document.getElementById('add-btn').classList.remove('secondary');
-    dateEl.value = new Date().toISOString().slice(0,10); 
+    dateEl.value = new Date().toISOString().slice(0, 10); 
     updateCategoryOptions(); 
   }
 }
 
-// 7. Render List & Update UI (UPDATED: Default Sorting)
+// 7. Render List & Update UI
 function renderTransactions(txs) {
   // Default: Sort by Date Descending (Newest First) if no filter is applied
-   if (!txs) {
+  if (!txs) {
     txs = transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-   }
+  }
 
   listEl.innerHTML = '';
   if (txs.length === 0) {
     listEl.innerHTML = '<li style="justify-content:center; color:#6c7a86;">No transactions found.</li>';
   }
+  
   txs.forEach(t => {
     const li = document.createElement('li');
     li.classList.add(t.type);
     const sign = t.type === 'expense' ? '-' : '+';
+    
     li.innerHTML = `
       <div class="tx-left">
           <div class="tx-details">
@@ -204,10 +211,12 @@ function renderTransactions(txs) {
           <button class="delete-btn" data-id="${t.id}">✖</button>
       </div>
     `;
+    
     li.querySelector('.delete-btn').addEventListener('click', () => deleteTransaction(t.id));
     li.querySelector('.edit-btn').addEventListener('click', () => editTransaction(t.id));
     listEl.appendChild(li);
   });
+  
   updateBalance();
   updateCharts();
 }
@@ -216,6 +225,7 @@ function updateBalance() {
   const income = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
   const expense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
   const total = income - expense;
+  
   incomeEl.textContent = formatCurrency(income);
   incomeEl.className = 'value value-income';
   expenseEl.textContent = formatCurrency(expense);
@@ -260,6 +270,7 @@ function updateCharts() {
   const expenseItems = transactions.filter(t => t.type === 'expense');
   const catMap = {};
   expenseItems.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount); });
+  
   const pieLabels = Object.keys(catMap);
   const pieData = Object.values(catMap);
 
@@ -284,10 +295,12 @@ function updateCharts() {
   // Sort for chart chronologically (Oldest -> Newest)
   const sorted = transactions.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   let running = 0;
+  
   sorted.forEach(t => {
     running += (t.type === 'income' ? Number(t.amount) : -Number(t.amount));
     dateMap[t.date] = running; 
   });
+  
   const lineLabels = Object.keys(dateMap);
   const lineData = Object.values(dateMap);
 
@@ -312,20 +325,26 @@ function updateCategoryOptions() {
   const currentType = typeEl.value;
   const cats = categories[currentType];
   categoryEl.innerHTML = '<option value="" disabled>Select Category</option>';
+  
   cats.forEach(cat => {
     const option = document.createElement('option');
-    option.value = cat; option.textContent = cat; categoryEl.appendChild(option);
+    option.value = cat; 
+    option.textContent = cat; 
+    categoryEl.appendChild(option);
   });
+  
   if (categoryEl.options.length > 1) categoryEl.options[1].selected = true;
   
   filterCategory.innerHTML = '<option value="all">All Categories</option>';
   [...new Set([...categories.expense, ...categories.income])].forEach(cat => {
     const option = document.createElement('option');
-    option.value = cat; option.textContent = cat; filterCategory.appendChild(option);
+    option.value = cat; 
+    option.textContent = cat; 
+    filterCategory.appendChild(option);
   });
 }
 
-// 9. Filters & Exports (UPDATED: Case Insensitive Search)
+// 9. Filters & Exports
 function applyFilters() {
   const sText = document.getElementById('search-text').value.trim().toLowerCase();
   const cat = filterCategory.value;
@@ -339,7 +358,8 @@ function applyFilters() {
     if (from && tDate < from) return false;
     if (to && tDate > to) return false;
     return true;
-  }).sort((a,b) => new Date(b.date) - new Date(a.date)); // Always sort filtered results by date desc
+  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+  
   renderTransactions(filtered);
 }
 
@@ -366,6 +386,7 @@ function exportToCsv() {
     t.type, 
     t.amount
   ]);
+  
   const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
   const a = document.createElement('a');
@@ -384,6 +405,7 @@ function downloadPdf() {
   
   const titleDiv = document.createElement('div');
   titleDiv.innerHTML = `<h1 style="text-align:center;color:#000;">Expense Report</h1><p style="text-align:center;color:#444;">${new Date().toLocaleDateString()}</p><hr style="margin-bottom:20px;">`;
+  
   const summaryClone = balanceCards.cloneNode(true);
   element.prepend(summaryClone);
   element.prepend(titleDiv);
@@ -408,8 +430,10 @@ function clearAllData() {
 }
 
 resetBtn.addEventListener('click', () => { 
-  txForm.reset(); dateEl.value = new Date().toISOString().slice(0,10); 
-  isEditing = false; editingId = null;
+  txForm.reset(); 
+  dateEl.value = new Date().toISOString().slice(0, 10); 
+  isEditing = false; 
+  editingId = null;
   document.getElementById('add-btn').textContent = 'Add Transaction';
   document.getElementById('add-btn').classList.remove('secondary');
   updateCategoryOptions(); 
@@ -426,18 +450,19 @@ document.getElementById('search-text').addEventListener('input', applyFilters);
 
 // Dark Mode Logic
 const themeBtn = document.getElementById('theme-toggle');
-if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); themeBtn.textContent = '☀️ Light Mode'; }
+if (localStorage.getItem('theme') === 'dark') { 
+  document.body.classList.add('dark-mode'); 
+  themeBtn.textContent = '☀️ Light Mode'; 
+}
+
 themeBtn.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
-  localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-  themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  themeBtn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
 });
 
-// Initial Load
-updateCategoryOptions();
-renderTransactions();
-
-// Budget Setting Event Listener
+// Budget Setting Event Listeners
 document.getElementById('set-budget-btn').addEventListener('click', () => {
   const currentLimit = localStorage.getItem('budgetLimit') || 0;
   const input = prompt("Enter your monthly budget limit (₹):", currentLimit);
@@ -451,17 +476,18 @@ document.getElementById('set-budget-btn').addEventListener('click', () => {
   }
 });
 
-// Reset Budget Event Listener
 document.getElementById('reset-budget-btn').addEventListener('click', () => {
-  // Check if a budget is currently set
   if (!localStorage.getItem('budgetLimit')) {
     showToast('No budget limit to reset!', 'info');
     return;
   }
-
   if (confirm("Are you sure you want to remove the monthly budget limit?")) {
-    localStorage.removeItem('budgetLimit'); // Remove from storage
-    updateBalance(); // Refresh the progress bar
+    localStorage.removeItem('budgetLimit');
+    updateBalance();
     showToast('Budget limit removed successfully', 'success');
   }
 });
+
+// Initial Load
+updateCategoryOptions();
+renderTransactions();
