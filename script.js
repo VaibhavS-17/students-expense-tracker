@@ -57,10 +57,17 @@ let pieChart = null;
 let lineChart = null;
 
 // 2. Category Configuration
-const categories = {
+const defaultCategories = {
   expense: ['Food', 'Travel', 'Books', 'Stationery', 'Entertainment', 'General', 'Other'],
   income: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
 };
+
+// Try to load from memory, otherwise use defaults
+let categories = JSON.parse(localStorage.getItem('customCategories')) || defaultCategories;
+
+function saveCategories() {
+  localStorage.setItem('customCategories', JSON.stringify(categories));
+}
 
 // 3. Initialize Data
 let transactions = [];
@@ -322,25 +329,32 @@ function updateCharts() {
 }
 
 function updateCategoryOptions() {
-  const currentType = typeEl.value;
+  const currentType = document.getElementById('type').value;
   const cats = categories[currentType];
-  categoryEl.innerHTML = '<option value="" disabled>Select Category</option>';
+  const catSelect = document.getElementById('category');
   
+  // Clear current options
+  catSelect.innerHTML = '<option value="" disabled selected>Select Category</option>';
+  
+  // Add options from our list
   cats.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat; 
     option.textContent = cat; 
-    categoryEl.appendChild(option);
+    catSelect.appendChild(option);
   });
   
-  if (categoryEl.options.length > 1) categoryEl.options[1].selected = true;
+  // Update the "Filter" dropdown too so you can search for the new category
+  const filterCat = document.getElementById('filter-category');
+  filterCat.innerHTML = '<option value="all">All Categories</option>';
   
-  filterCategory.innerHTML = '<option value="all">All Categories</option>';
-  [...new Set([...categories.expense, ...categories.income])].forEach(cat => {
+  // Combine all unique categories for the filter list
+  const allCats = [...new Set([...categories.expense, ...categories.income])].sort();
+  allCats.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat; 
     option.textContent = cat; 
-    filterCategory.appendChild(option);
+    filterCat.appendChild(option);
   });
 }
 
@@ -487,6 +501,104 @@ document.getElementById('reset-budget-btn').addEventListener('click', () => {
     showToast('Budget limit removed successfully', 'success');
   }
 });
+
+// --- NEW: Add Category Logic ---
+document.getElementById('add-cat-btn').addEventListener('click', () => {
+  // 1. Get the current type (Income or Expense)
+  const currentType = document.getElementById('type').value;
+  
+  // 2. Ask the user for a name
+  const newCat = prompt(`Enter new ${currentType} category name:`);
+  
+  // 3. If they typed something valid...
+  if (newCat && newCat.trim() !== "") {
+    const formattedCat = newCat.trim();
+    
+    // 4. Check if it already exists to avoid duplicates
+    if (!categories[currentType].includes(formattedCat)) {
+      categories[currentType].push(formattedCat); // Add to list
+      saveCategories(); // Save to memory
+      updateCategoryOptions(); // Refresh dropdown
+      
+      // Auto-select the new one
+      document.getElementById('category').value = formattedCat;
+      showToast(`Category "${formattedCat}" added!`, 'success');
+    } else {
+      showToast('Category already exists!', 'error');
+    }
+  }
+});
+
+// --- NEW: Remove Category Logic ---
+document.getElementById('del-cat-btn').addEventListener('click', () => {
+  const currentType = document.getElementById('type').value;
+  const selectedCat = document.getElementById('category').value;
+
+  // 1. Check if a category is actually selected
+  if (!selectedCat) {
+    showToast('Please select a category to remove first!', 'error');
+    return;
+  }
+
+  // 2. SAFETY CHECK: Prevent deleting default categories
+  // We check if the selected category exists in the 'defaultCategories' list we defined at the top
+  if (defaultCategories[currentType].includes(selectedCat)) {
+    showToast('You cannot delete default categories.', 'error');
+    return;
+  }
+
+  // 3. Confirm with the user
+  if (confirm(`Are you sure you want to delete the category "${selectedCat}"?`)) {
+    
+    // 4. Find and Remove it from the list
+    const index = categories[currentType].indexOf(selectedCat);
+    if (index > -1) {
+      categories[currentType].splice(index, 1); // Remove 1 item at that index
+      
+      saveCategories(); // Save to memory
+      updateCategoryOptions(); // Refresh the dropdown
+      
+      showToast(`Category "${selectedCat}" removed.`, 'info');
+    }
+  }
+});
+
+// --- NEW: Smart Date Filter Logic ---
+function setDateFilter(range) {
+  const now = new Date();
+  let start, end;
+  let label = ''; // Variable to hold the nice name
+
+  // 1. Calculate Dates & Set Label
+  if (range === 'thisMonth') {
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+    end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    label = "This Month";
+  } else if (range === 'lastMonth') {
+    start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    end = new Date(now.getFullYear(), now.getMonth(), 0);
+    label = "Last Month";
+  } else if (range === 'last30') {
+    end = new Date();
+    start = new Date();
+    start.setDate(end.getDate() - 30);
+    label = "Last 30 Days"; // Fixes the "last30" text issue
+  }
+
+  // 2. Format dates to YYYY-MM-DD
+  const fmt = (d) => {
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().split('T')[0];
+  }
+
+  // 3. Update Inputs
+  document.getElementById('filter-from').value = fmt(start);
+  document.getElementById('filter-to').value = fmt(end);
+  
+  // 4. Run Filter & Show Clean Toast
+  applyFilters();
+  showToast(`Showing data for: ${label}`, 'info');
+}
 
 // Initial Load
 updateCategoryOptions();

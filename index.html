@@ -1,179 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Student's Expense Tracker</title>
-    
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232a9d8f%22>₹</text></svg>">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="page">
-      
-      <aside class="panel left-panel">
-        <h2>Rajiv Gandhi Institute of Technology</h2>
-        <p>Branch: Computer Engineering</p>
-        <p class="muted">Mini Project: Student's Expense Tracker Web Application</p>
-        <p class="small-note">Built by: Vaibhav, Dnyaneshwar, Zaid, Vedant</p>
-      </aside>
 
-      <main class="container">
-        <div class="header-row">
-          <h1>Student's Expense Tracker</h1>
-          <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
-        </div>
+        <aside class="panel left-panel">
+            <h2>Rajiv Gandhi Institute of Technology</h2>
+            <p>Branch: Computer Engineering</p>
+            <p class="muted">Mini Project: Student's Expense Tracker Web Application</p>
+            <p class="small-note">Built by: Vaibhav, Dnyaneshwar, Zaid, Vedant</p>
+        </aside>
 
-        <div class="balance-container">
-          <div class="card">
-            <h4>Your Balance</h4>
-            <p id="balance" class="value">₹0.00</p>
-          </div>
-          <div class="card">
-            <h4>Total Income</h4>
-            <p id="total-income" class="value value-income">₹0.00</p>
-          </div>
-          <div class="card">
-            <h4>Total Expense</h4>
-            <p id="total-expense" class="value value-expense">₹0.00</p>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 20px; text-align: left; padding: 15px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h4 style="margin:0;">Monthly Budget Goal</h4>
-            <div style="display:flex; gap:5px;">
-              <button id="set-budget-btn" style="padding:4px 10px; font-size:12px;">Set Limit</button>
-              <button id="reset-budget-btn" style="padding:4px 8px; font-size:12px; background:#e63946;" title="Remove Limit">✖</button>
-            </div>
-          </div>
-          
-          <div style="background:#e0e0e0; border-radius:20px; height:18px; width:100%; overflow:hidden; position:relative;">
-            <div id="budget-bar" style="background:var(--accent); height:100%; width:0%; transition: width 0.6s ease, background-color 0.4s ease;"></div>
-          </div>
-          
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-            <p id="budget-text" class="small-note" style="margin:0; font-weight:600;">Spending: 0%</p>
-            <p id="budget-val" class="small-note" style="margin:0;">Limit: ₹0</p>
-          </div>
-        </div>
-
-        <div class="form-card">
-          <form id="tx-form">
-            <h3>Add New Transaction</h3>
-            
-            <div class="row">
-              <div>
-                <label for="type">Type</label>
-                <select id="type">
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
-                </select>
-              </div>
-              <div>
-                <label for="category">Category</label>
-                <select id="category">
-                  <option value="" disabled selected>Select Category</option>
-                </select>
-              </div>
-              <div>
-                <label for="date">Date</label>
-                <input type="date" id="date" required />
-              </div>
+        <main class="container">
+            <div class="header-row">
+                <h1>Student's Expense Tracker</h1>
+                <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
             </div>
 
-            <div class="row">
-              <div>
-                <label for="description">Description</label>
-                <input type="text" id="description" placeholder="Enter description..." required />
-              </div>
-              <div>
-                <label for="amount">Amount (INR)</label>
-                <input type="number" id="amount" placeholder="Enter amount..." required />
-              </div>
+            <div class="balance-container">
+                <div class="card">
+                    <h4>Your Balance</h4>
+                    <p id="balance" class="value">₹0.00</p>
+                </div>
+                <div class="card">
+                    <h4>Total Income</h4>
+                    <p id="total-income" class="value value-income">₹0.00</p>
+                </div>
+                <div class="card">
+                    <h4>Total Expense</h4>
+                    <p id="total-expense" class="value value-expense">₹0.00</p>
+                </div>
             </div>
 
-            <div class="form-actions">
-              <button type="submit" id="add-btn">Add Transaction</button>
-              <button type="reset" id="reset-btn" class="secondary">Reset Form</button>
-            </div>
-          </form>
-        </div>
+            <div class="card" style="margin-bottom: 20px; text-align: left; padding: 15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h4 style="margin:0;">Monthly Budget Goal</h4>
+                    <div style="display:flex; gap:5px;">
+                        <button id="set-budget-btn" style="padding:4px 10px; font-size:12px;">Set Limit</button>
+                        <button id="reset-budget-btn" style="padding:4px 8px; font-size:12px; background:#e63946;" title="Remove Limit">✖</button>
+                    </div>
+                </div>
 
-        <div class="filter-card">
-          <h3>Filter Transactions</h3>
-          <div class="filters">
-            <div class="filter-group">
-              <label for="search-text">Search Description</label>
-              <input type="text" id="search-text" placeholder="e.g. Lunch..." />
-            </div>
-            
-            <div class="filter-group">
-              <label for="filter-category">Category</label>
-              <select id="filter-category">
-                <option value="all">All Categories</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>From Date</label>
-              <input type="date" id="filter-from" placeholder="Select Date" required />
-            </div>
-            
-            <div class="filter-group">
-              <label>To Date</label>
-              <input type="date" id="filter-to" placeholder="Select Date" required />
+                <div style="background:#e0e0e0; border-radius:20px; height:18px; width:100%; overflow:hidden; position:relative;">
+                    <div id="budget-bar" style="background:var(--accent); height:100%; width:0%; transition: width 0.6s ease, background-color 0.4s ease;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                    <p id="budget-text" class="small-note" style="margin:0; font-weight:600;">Spending: 0%</p>
+                    <p id="budget-val" class="small-note" style="margin:0;">Limit: ₹0</p>
+                </div>
             </div>
 
-            <div class="filter-actions">
-              <button id="apply-filters">Apply Filters</button>
-              <button id="clear-filters" class="secondary">Clear Filters</button>
+            <div class="form-card">
+                <form id="tx-form">
+                    <h3>Add New Transaction</h3>
+
+                    <div class="row">
+                        <div>
+                            <label for="type">Type</label>
+                            <select id="type">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="category">Category</label>
+                            <div style="display:flex; gap:5px;">
+                                <select id="category" style="flex:1;">
+                                    <option value="" disabled selected>Select Category</option>
+                                </select>
+                                <button id="add-cat-btn" type="button" style="padding:0 10px; font-size: 18px;" title="Add Custom Category">+</button>
+                                <button id="del-cat-btn" type="button" style="padding:0 10px; font-size: 18px; background-color: #e63946;" title="Remove Selected Category">-</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="date">Date</label>
+                            <input type="date" id="date" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <label for="description">Description</label>
+                            <input type="text" id="description" placeholder="Enter description..." required />
+                        </div>
+                        <div>
+                            <label for="amount">Amount (INR)</label>
+                            <input type="number" id="amount" placeholder="Enter amount..." required />
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="add-btn">Add Transaction</button>
+                        <button type="reset" id="reset-btn" class="secondary">Reset Form</button>
+                    </div>
+                </form>
             </div>
-          </div>
-        </div>
 
-        <div id="report-area">
-          <div class="history">
-            <h3>Transaction History</h3>
-            <ul id="list"></ul>
-          </div>
+            <div class="filter-card">
+                <h3>Filter Transactions</h3>
+                <div class="filters">
+                    <div class="filter-group" style="grid-column: 1 / -1; display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+                        <button type="button" class="secondary" onclick="setDateFilter('thisMonth')">This Month</button>
+                        <button type="button" class="secondary" onclick="setDateFilter('lastMonth')">Last Month</button>
+                        <button type="button" class="secondary" onclick="setDateFilter('last30')">Last 30 Days</button>
+                    </div>
+                    <div class="filter-group">
+                        <label for="search-text">Search Description</label>
+                        <input type="text" id="search-text" placeholder="e.g. Lunch..." />
+                    </div>
 
-          <div class="analytics">
-            <div class="chart-card">
-              <canvas id="pieChart" aria-label="Expense by category" role="img"></canvas>
+                    <div class="filter-group">
+                        <label for="filter-category">Category</label>
+                        <select id="filter-category">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" id="filter-from" placeholder="Select Date" required />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" id="filter-to" placeholder="Select Date" required />
+                    </div>
+
+                    <div class="filter-actions">
+                        <button id="apply-filters">Apply Filters</button>
+                        <button id="clear-filters" class="secondary">Clear Filters</button>
+                    </div>
+                </div>
             </div>
-            <div class="chart-card">
-              <canvas id="lineChart" aria-label="Balance over time" role="img"></canvas>
+
+            <div id="report-area">
+                <div class="history">
+                    <h3>Transaction History</h3>
+                    <ul id="list"></ul>
+                </div>
+
+                <div class="analytics">
+                    <div class="chart-card">
+                        <canvas id="pieChart" aria-label="Expense by category" role="img"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <canvas id="lineChart" aria-label="Balance over time" role="img"></canvas>
+                    </div>
+                </div>
+
+                <div class="export-row">
+                    <button id="export-csv">Export CSV</button>
+                    <button id="download-pdf">Download PDF</button>
+                    <button id="clear-all" class="danger">Clear All Data</button>
+                </div>
+                <p class="small-note">Tip: Use the date selector when adding transactions to build monthly reports.</p>
             </div>
-          </div>
+        </main>
 
-          <div class="export-row">
-            <button id="export-csv">Export CSV</button>
-            <button id="download-pdf">Download PDF</button>
-            <button id="clear-all" class="danger">Clear All Data</button>
-          </div>
-          <p class="small-note">Tip: Use the date selector when adding transactions to build monthly reports.</p>
-        </div>
-      </main>
-
-      <aside class="panel right-panel">
-        <h3>Project Members</h3>
-        <ul class="members">
-          <li>Zaid Chouhan (Roll No. 602)</li>
-          <li>Vedant Puradkar (Roll No. 615)</li>
-          <li>Vaibhav Sable (Roll No. 616)</li>
-          <li>Dnyaneshwar Sangle (Roll No. 618)</li>
-        </ul>
-        <p class="guide">Submitted to:<br><em>Dr. Yogaraj S. Patil</em></p>
-        <p class="muted small-note">This local app saves data in your browser. Clear data if you want a fresh start.</p>
-      </aside>
+        <aside class="panel right-panel">
+            <h3>Project Members</h3>
+            <ul class="members">
+                <li>Zaid Chouhan (Roll No. 602)</li>
+                <li>Vedant Puradkar (Roll No. 615)</li>
+                <li>Vaibhav Sable (Roll No. 616)</li>
+                <li>Dnyaneshwar Sangle (Roll No. 618)</li>
+            </ul>
+            <p class="guide">Submitted to:<br><em>Dr. Yogaraj S. Patil</em></p>
+            <p class="muted small-note">This local app saves data in your browser. Clear data if you want a fresh start.</p>
+        </aside>
     </div>
-    
+
     <script src="script.js"></script>
-  </body>
+</body>
+
 </html>
