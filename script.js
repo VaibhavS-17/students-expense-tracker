@@ -1,4 +1,7 @@
 // Student's Expense Tracker - Core Logic
+// IMPROVED: Added Constants to avoid typos
+const TYPE_EXPENSE = 'expense';
+const TYPE_INCOME = 'income';
 
 // Helper: Sanitize Input to prevent XSS
 function escapeHtml(text) {
@@ -6,6 +9,41 @@ function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
+
+// --- CUSTOM MODAL SYSTEM ---
+const modal = document.getElementById('confirm-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalMsg = document.getElementById('modal-msg');
+const btnCancel = document.getElementById('btn-cancel');
+const btnConfirm = document.getElementById('btn-confirm');
+
+let currentCallback = null; // Store the function to run if user clicks "Yes"
+
+function showConfirm(title, message, onConfirm) {
+  modalTitle.textContent = title;
+  modalMsg.textContent = message;
+  currentCallback = onConfirm;
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
+}
+
+function closeConfirm() {
+  modal.classList.remove('active');
+  setTimeout(() => modal.classList.add('hidden'), 300); // Wait for animation
+  currentCallback = null;
+}
+
+btnCancel.addEventListener('click', closeConfirm);
+
+btnConfirm.addEventListener('click', () => {
+  if (currentCallback) currentCallback();
+  closeConfirm();
+});
+
+// Close if clicking outside the box
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeConfirm();
+});
 
 // --- TOAST NOTIFICATION SYSTEM ---
 const toastContainer = document.createElement('div');
@@ -57,9 +95,10 @@ let pieChart = null;
 let lineChart = null;
 
 // 2. Category Configuration
+// IMPROVEMENT: Use the constants here so it matches the rest of the code
 const defaultCategories = {
-  expense: ['Food', 'Travel', 'Books', 'Stationery', 'Entertainment', 'General', 'Other'],
-  income: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
+  [TYPE_EXPENSE]: ['Food', 'Travel', 'Books', 'Stationery', 'Entertainment', 'General', 'Other'],
+  [TYPE_INCOME]: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
 };
 
 // Try to load from memory, otherwise use defaults
@@ -95,8 +134,9 @@ function saveTransactions() {
   localStorage.setItem('transactions', JSON.stringify(transactions));
 }
 
+// IMPROVEMENT: Use Date.now() for unique IDs instead of Math.random()
 function generateId() {
-  return Math.floor(Math.random() * 10000000);
+  return Date.now(); 
 }
 
 // 4. Add Transaction Logic
@@ -124,11 +164,26 @@ function addTransaction(e) {
   showToast('Transaction added successfully!', 'success');
 }
 
-// 5. Delete Transaction
+// 5. Delete Transaction (Updated with Confirmation)
 function deleteTransaction(id) {
-  transactions = transactions.filter(t => t.id !== id);
-  saveTransactions();
-  renderTransactions();
+  // 1. Find the transaction first so we can show its name
+  const tx = transactions.find(t => t.id === Number(id));
+  
+  // Safety check: if not found, stop
+  if (!tx) return;
+
+  // 2. Show the Custom Confirmation Modal
+  showConfirm(
+    'Delete Transaction?', 
+    `Are you sure you want to delete "${tx.description}"?`, 
+    () => {
+      // 3. This code runs ONLY if they click "Yes"
+      transactions = transactions.filter(t => t.id !== Number(id));
+      saveTransactions();
+      renderTransactions();
+      showToast('Transaction deleted successfully', 'success');
+    }
+  );
 }
 
 // 6. Edit Transaction Logic
@@ -136,7 +191,7 @@ let isEditing = false;
 let editingId = null;
 
 function editTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
+  const transaction = transactions.find(t => t.id === Number(id));
   if (!transaction) return;
   isEditing = true;
   editingId = id;
@@ -148,8 +203,9 @@ function editTransaction(id) {
   updateCategoryOptions();
   categoryEl.value = transaction.category;
   
-  document.getElementById('add-btn').textContent = 'Update Transaction';
-  document.getElementById('add-btn').classList.add('secondary');
+  const addBtn = document.getElementById('add-btn');
+  addBtn.textContent = 'Update Transaction';
+  addBtn.classList.add('secondary');
   descriptionEl.focus();
 }
 
@@ -163,7 +219,7 @@ txForm.addEventListener('submit', function (e) {
 });
 
 function updateTransaction() {
-  const index = transactions.findIndex(t => t.id === editingId);
+  const index = transactions.findIndex(t => t.id === Number(editingId));
   if (index !== -1) {
     transactions[index].description = descriptionEl.value.trim();
     transactions[index].amount = Number(amountEl.value.trim());
@@ -177,8 +233,11 @@ function updateTransaction() {
     isEditing = false;
     editingId = null;
     txForm.reset();
-    document.getElementById('add-btn').textContent = 'Add Transaction';
-    document.getElementById('add-btn').classList.remove('secondary');
+    
+    const addBtn = document.getElementById('add-btn');
+    addBtn.textContent = 'Add Transaction';
+    addBtn.classList.remove('secondary');
+    
     dateEl.value = new Date().toISOString().slice(0, 10); 
     updateCategoryOptions(); 
   }
@@ -186,20 +245,31 @@ function updateTransaction() {
 
 // 7. Render List & Update UI
 function renderTransactions(txs) {
-  // Default: Sort by Date Descending (Newest First) if no filter is applied
   if (!txs) {
     txs = transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 
   listEl.innerHTML = '';
   if (txs.length === 0) {
-    listEl.innerHTML = '<li style="justify-content:center; color:#6c7a86;">No transactions found.</li>';
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">💸</div>
+        <div class="empty-title">No transactions yet</div>
+        <div class="empty-desc">Start by adding your income or expenses above to see your analytics.</div>
+      </div>
+    `;
+    // We return here so we don't try to loop through empty data
+    // Important: Update balance/charts to show 0 before returning
+    updateBalance();
+    updateCharts();
+    return;
   }
   
   txs.forEach(t => {
     const li = document.createElement('li');
-    li.classList.add(t.type);
-    const sign = t.type === 'expense' ? '-' : '+';
+    // Ensure we use the right class for CSS styling
+    li.classList.add(t.type); 
+    const sign = t.type === TYPE_EXPENSE ? '-' : '+';
     
     li.innerHTML = `
       <div class="tx-left">
@@ -229,8 +299,9 @@ function renderTransactions(txs) {
 }
 
 function updateBalance() {
-  const income = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-  const expense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+  // IMPROVED: Use Constants for type checking
+  const income = transactions.filter(t => t.type === TYPE_INCOME).reduce((acc, t) => acc + t.amount, 0);
+  const expense = transactions.filter(t => t.type === TYPE_EXPENSE).reduce((acc, t) => acc + t.amount, 0);
   const total = income - expense;
   
   incomeEl.textContent = formatCurrency(income);
@@ -274,7 +345,8 @@ function updateBalance() {
 
 // 8. Chart Logic
 function updateCharts() {
-  const expenseItems = transactions.filter(t => t.type === 'expense');
+  // IMPROVED: Use Constants
+  const expenseItems = transactions.filter(t => t.type === TYPE_EXPENSE);
   const catMap = {};
   expenseItems.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount); });
   
@@ -299,12 +371,12 @@ function updateCharts() {
   });
 
   const dateMap = {};
-  // Sort for chart chronologically (Oldest -> Newest)
   const sorted = transactions.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   let running = 0;
   
   sorted.forEach(t => {
-    running += (t.type === 'income' ? Number(t.amount) : -Number(t.amount));
+    // IMPROVED: Use Constants
+    running += (t.type === TYPE_INCOME ? Number(t.amount) : -Number(t.amount));
     dateMap[t.date] = running; 
   });
   
@@ -333,10 +405,8 @@ function updateCategoryOptions() {
   const cats = categories[currentType];
   const catSelect = document.getElementById('category');
   
-  // Clear current options
   catSelect.innerHTML = '<option value="" disabled selected>Select Category</option>';
   
-  // Add options from our list
   cats.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat; 
@@ -344,12 +414,11 @@ function updateCategoryOptions() {
     catSelect.appendChild(option);
   });
   
-  // Update the "Filter" dropdown too so you can search for the new category
   const filterCat = document.getElementById('filter-category');
   filterCat.innerHTML = '<option value="all">All Categories</option>';
   
-  // Combine all unique categories for the filter list
-  const allCats = [...new Set([...categories.expense, ...categories.income])].sort();
+  // Combine all unique categories
+  const allCats = [...new Set([...categories[TYPE_EXPENSE], ...categories[TYPE_INCOME]])].sort();
   allCats.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat; 
@@ -448,8 +517,9 @@ resetBtn.addEventListener('click', () => {
   dateEl.value = new Date().toISOString().slice(0, 10); 
   isEditing = false; 
   editingId = null;
-  document.getElementById('add-btn').textContent = 'Add Transaction';
-  document.getElementById('add-btn').classList.remove('secondary');
+  const addBtn = document.getElementById('add-btn');
+  addBtn.textContent = 'Add Transaction';
+  addBtn.classList.remove('secondary');
   updateCategoryOptions(); 
 });
 
@@ -458,7 +528,21 @@ applyFiltersBtn.addEventListener('click', applyFilters);
 clearFiltersBtn.addEventListener('click', clearFilters);
 exportCsvBtn.addEventListener('click', exportToCsv);
 downloadPdfBtn.addEventListener('click', downloadPdf);
-clearAllBtn.addEventListener('click', clearAllData);
+
+clearAllBtn.addEventListener('click', () => {
+  showConfirm(
+    'Clear All Data?', 
+    'This will permanently delete all transactions. This action cannot be undone.', 
+    () => {
+      // This code runs only if they click "Yes"
+      transactions = []; 
+      saveTransactions(); 
+      renderTransactions(); 
+      showToast('All data has been cleared.', 'info');
+    }
+  );
+});
+
 typeEl.addEventListener('change', updateCategoryOptions);
 document.getElementById('search-text').addEventListener('input', applyFilters);
 
@@ -476,7 +560,7 @@ themeBtn.addEventListener('click', () => {
   themeBtn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
 });
 
-// Budget Setting Event Listeners
+// Budget Setting
 document.getElementById('set-budget-btn').addEventListener('click', () => {
   const currentLimit = localStorage.getItem('budgetLimit') || 0;
   const input = prompt("Enter your monthly budget limit (₹):", currentLimit);
@@ -495,32 +579,29 @@ document.getElementById('reset-budget-btn').addEventListener('click', () => {
     showToast('No budget limit to reset!', 'info');
     return;
   }
-  if (confirm("Are you sure you want to remove the monthly budget limit?")) {
-    localStorage.removeItem('budgetLimit');
-    updateBalance();
-    showToast('Budget limit removed successfully', 'success');
-  }
+  
+  showConfirm(
+    'Remove Budget?',
+    'Are you sure you want to remove the monthly budget limit?',
+    () => {
+      localStorage.removeItem('budgetLimit');
+      updateBalance();
+      showToast('Budget limit removed successfully', 'success');
+    }
+  );
 });
 
-// --- NEW: Add Category Logic ---
+// Add Category Logic
 document.getElementById('add-cat-btn').addEventListener('click', () => {
-  // 1. Get the current type (Income or Expense)
   const currentType = document.getElementById('type').value;
-  
-  // 2. Ask the user for a name
   const newCat = prompt(`Enter new ${currentType} category name:`);
   
-  // 3. If they typed something valid...
   if (newCat && newCat.trim() !== "") {
     const formattedCat = newCat.trim();
-    
-    // 4. Check if it already exists to avoid duplicates
     if (!categories[currentType].includes(formattedCat)) {
-      categories[currentType].push(formattedCat); // Add to list
-      saveCategories(); // Save to memory
-      updateCategoryOptions(); // Refresh dropdown
-      
-      // Auto-select the new one
+      categories[currentType].push(formattedCat); 
+      saveCategories(); 
+      updateCategoryOptions(); 
       document.getElementById('category').value = formattedCat;
       showToast(`Category "${formattedCat}" added!`, 'success');
     } else {
@@ -529,47 +610,42 @@ document.getElementById('add-cat-btn').addEventListener('click', () => {
   }
 });
 
-// --- NEW: Remove Category Logic ---
+// Remove Category Logic
 document.getElementById('del-cat-btn').addEventListener('click', () => {
   const currentType = document.getElementById('type').value;
   const selectedCat = document.getElementById('category').value;
 
-  // 1. Check if a category is actually selected
   if (!selectedCat) {
     showToast('Please select a category to remove first!', 'error');
     return;
   }
 
-  // 2. SAFETY CHECK: Prevent deleting default categories
-  // We check if the selected category exists in the 'defaultCategories' list we defined at the top
   if (defaultCategories[currentType].includes(selectedCat)) {
     showToast('You cannot delete default categories.', 'error');
     return;
   }
 
-  // 3. Confirm with the user
-  if (confirm(`Are you sure you want to delete the category "${selectedCat}"?`)) {
-    
-    // 4. Find and Remove it from the list
-    const index = categories[currentType].indexOf(selectedCat);
-    if (index > -1) {
-      categories[currentType].splice(index, 1); // Remove 1 item at that index
-      
-      saveCategories(); // Save to memory
-      updateCategoryOptions(); // Refresh the dropdown
-      
-      showToast(`Category "${selectedCat}" removed.`, 'info');
+  showConfirm(
+    'Delete Category?',
+    `Are you sure you want to delete the custom category "${selectedCat}"?`,
+    () => {
+      const index = categories[currentType].indexOf(selectedCat);
+      if (index > -1) {
+        categories[currentType].splice(index, 1); 
+        saveCategories(); 
+        updateCategoryOptions(); 
+        showToast(`Category "${selectedCat}" removed.`, 'info');
+      }
     }
-  }
+  );
 });
 
-// --- NEW: Smart Date Filter Logic ---
+// Date Filter Logic
 function setDateFilter(range) {
   const now = new Date();
   let start, end;
-  let label = ''; // Variable to hold the nice name
+  let label = '';
 
-  // 1. Calculate Dates & Set Label
   if (range === 'thisMonth') {
     start = new Date(now.getFullYear(), now.getMonth(), 1);
     end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -582,20 +658,17 @@ function setDateFilter(range) {
     end = new Date();
     start = new Date();
     start.setDate(end.getDate() - 30);
-    label = "Last 30 Days"; // Fixes the "last30" text issue
+    label = "Last 30 Days"; 
   }
 
-  // 2. Format dates to YYYY-MM-DD
   const fmt = (d) => {
     const offset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() - offset).toISOString().split('T')[0];
   }
 
-  // 3. Update Inputs
   document.getElementById('filter-from').value = fmt(start);
   document.getElementById('filter-to').value = fmt(end);
   
-  // 4. Run Filter & Show Clean Toast
   applyFilters();
   showToast(`Showing data for: ${label}`, 'info');
 }
