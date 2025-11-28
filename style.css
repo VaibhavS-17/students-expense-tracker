@@ -650,3 +650,25 @@ body.dark-mode .modal-actions .secondary {
 body.dark-mode .modal-actions .secondary:hover {
   background: #383838;
 }
+
+/* ========================================= */
+/* 17. DATE FILTER BUTTONS FIX               */
+/* ========================================= */
+
+.filter-date-row {
+  grid-column: 1 / -1;    /* Spans the full width of the filter box */
+  display: flex;          /* Align items in a row */
+  gap: 10px;              /* Space between buttons */
+  margin-bottom: 10px;
+}
+
+.filter-date-row button {
+  flex: 1;                /* Makes all 3 buttons equal width */
+}
+
+/* On Mobile: Stack them vertically (like in your screenshot) */
+@media (max-width: 768px) {
+  .filter-date-row {
+    flex-direction: column;
+  }
+}
