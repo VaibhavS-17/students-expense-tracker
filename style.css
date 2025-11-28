@@ -296,7 +296,7 @@ button.danger { background: var(--danger); }
   box-shadow: 0 8px 22px rgba(18, 30, 40, 0.04);
 }
 
-.export-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+.export-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
 .export-row button { background: #f4f6f7; color: var(--accent-2); border: 1px solid rgba(18, 30, 40, 0.04); padding: 10px 12px; }
 .export-row button#clear-all { background: var(--danger); color: #fff; border: none; }
 
@@ -348,7 +348,7 @@ body.dark-mode .small-note { color: #bbb; }
 /* 10. PDF PRINT STYLES                      */
 /* ========================================= */
 .printing { background: white !important; padding: 20px !important; font-family: 'Poppins', sans-serif !important; }
-.printing .delete-btn, .printing .edit-btn, .printing .export-row, .printing .small-note { display: none !important; }
+.printing .delete-btn, .printing .edit-btn, .printing .export-container-split, .printing .small-note { display: none !important; }
 .printing .tx-desc { color: #000 !important; font-weight: 800 !important; font-size: 14px !important; }
 .printing .tx-meta { color: #444 !important; font-weight: 600 !important; }
 .printing h4 { color: #000 !important; }
@@ -671,4 +671,48 @@ body.dark-mode .modal-actions .secondary:hover {
   .filter-date-row {
     flex-direction: column;
   }
+}
+
+/* ========================================= */
+/* 18. SPLIT BUTTON LAYOUT                   */
+/* ========================================= */
+
+.export-container-split {
+    display: flex;
+    justify-content: space-between; /* Pushes groups to opposite sides */
+    align-items: center;
+    flex-wrap: wrap; /* Allows wrapping on mobile */
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.05); /* Subtle divider line */
+}
+
+/* Internal groups should stick together */
+.left-actions, .right-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Dark Mode adjustment for the divider line */
+body.dark-mode .export-container-split {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* MOBILE FIX: Stack them vertically on small phones */
+@media (max-width: 600px) {
+    .export-container-split {
+        flex-direction: column;
+        align-items: stretch; /* Make buttons full width */
+    }
+    
+    .left-actions, .right-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .export-container-split button {
+        width: 100%;
+    }
 }

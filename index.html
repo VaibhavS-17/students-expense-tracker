@@ -163,11 +163,24 @@
                     </div>
                 </div>
 
-                <div class="export-row">
-                    <button id="export-csv">Export CSV</button>
-                    <button id="download-pdf">Download PDF</button>
-                    <button id="clear-all" class="danger">Clear All Data</button>
+                <div class="export-container-split">
+
+                    <div class="left-actions">
+                        <input type="file" id="import-file" accept=".json" style="display: none;" />
+                        <button id="btn-backup" class="secondary" title="Save Backup File">💾 Backup</button>
+                        <button id="btn-restore" class="secondary" title="Restore from File">📂 Restore</button>
+                    </div>
+
+                    <div class="right-actions">
+                        <button id="export-csv">Export CSV</button>
+                        <button id="download-pdf">Download PDF</button>
+                        <button id="clear-all" class="danger">Clear All</button>
+                    </div>
+
                 </div>
+                <p class="small-note" style="text-align:right; margin-top:5px;">
+                    <small>💡 Tip: Press <b>"/"</b> to search, <b>"Esc"</b> to clear filters.</small>
+                </p>
             </div>
         </main>
 

@@ -451,7 +451,10 @@ function clearFilters() {
   filterCategory.value = 'all';
   filterFrom.value = '';
   filterTo.value = '';
-  renderTransactions();
+  
+  // FIX: Explicitly pass null or the full list to ensure it resets
+  renderTransactions(transactions); 
+  showToast('Filters cleared', 'info'); // Nice feedback
 }
 
 function exportToCsv() {
@@ -672,6 +675,104 @@ function setDateFilter(range) {
   applyFilters();
   showToast(`Showing data for: ${label}`, 'info');
 }
+
+// =========================================
+// 11. ADVANCED FEATURES (Backup & Restore)
+// =========================================
+
+// A. Backup Data (Download JSON)
+document.getElementById('btn-backup').addEventListener('click', () => {
+  const data = {
+    transactions: transactions,
+    categories: categories,
+    budgetLimit: localStorage.getItem('budgetLimit'),
+    lastBackup: new Date().toISOString()
+  };
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", "expense_tracker_backup.json");
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+  
+  showToast('Backup file saved successfully!', 'success');
+});
+
+// B. Restore Data (Trigger Input)
+const fileInput = document.getElementById('import-file');
+document.getElementById('btn-restore').addEventListener('click', () => {
+  // Show warning before overwriting
+  showConfirm(
+    'Restore Data?',
+    'This will OVERWRITE your current data with the backup file. Are you sure?',
+    () => fileInput.click() // Trigger the hidden file input
+  );
+});
+
+// C. Process Uploaded File
+fileInput.addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      // Basic Validation: Check if it has transactions array
+      if (!Array.isArray(importedData.transactions)) {
+        throw new Error("Invalid file format");
+      }
+
+      // Restore Data
+      transactions = importedData.transactions;
+      if (importedData.categories) categories = importedData.categories;
+      if (importedData.budgetLimit) localStorage.setItem('budgetLimit', importedData.budgetLimit);
+
+      // Save to LocalStorage
+      saveTransactions();
+      saveCategories();
+      
+      // Update UI
+      renderTransactions();
+      updateCategoryOptions();
+      updateBalance();
+      
+      showToast('Data restored successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Error: Invalid Backup File', 'error');
+    }
+    // Clear input so same file can be selected again if needed
+    fileInput.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// =========================================
+// 12. KEYBOARD SHORTCUTS
+// =========================================
+document.addEventListener('keydown', (e) => {
+  // 1. Press "/" to Search
+  if (e.key === '/' && document.activeElement !== descriptionEl) {
+    e.preventDefault(); // Prevent typing "/"
+    document.getElementById('search-text').focus();
+  }
+
+  // 2. Press "Esc" to Clear Search/Filters or Close Modal
+  if (e.key === 'Escape') {
+    // If modal is open, close it
+    if (modal.classList.contains('active')) {
+      closeConfirm();
+      return;
+    }
+    // Otherwise clear filters
+    clearFilters();
+    document.activeElement.blur(); // Remove focus
+  }
+});
 
 // Initial Load
 updateCategoryOptions();
