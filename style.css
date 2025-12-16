@@ -178,10 +178,10 @@ body {
   width: 100%;
 }
 
-/* Bottom Filter Layout (Grid Fix) */
+/* Bottom Filter Layout */
 .filters {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Creates exactly 2 equal columns */
+  grid-template-columns: 1fr 1fr;
   gap: 15px;
   align-items: start;
 }
@@ -202,7 +202,7 @@ body {
 
 /* Button Containers */
 .form-actions, .filter-actions {
-  grid-column: 1 / -1; /* Spans from first column to the last */
+  grid-column: 1 / -1; 
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -404,7 +404,7 @@ body.dark-mode .toast { background: #2d2d2d; color: #fff; box-shadow: 0 8px 24px
 /* 12. MOBILE & iPHONE OPTIMIZATIONS         */
 /* ========================================= */
 @media (max-width: 980px) {
-  .page { flex-direction: column; align-items: stretch; gap: 15px; } /* Changed align-items to stretch for full width */
+  .page { flex-direction: column; align-items: stretch; gap: 15px; } 
   .panel { width: 100%; max-width: 100%; flex: 1 1 auto; margin-bottom: 10px; }
   .container { width: 100%; max-width: 100%; }
 }
@@ -521,7 +521,6 @@ input[type="date"] {
 /* ========================================= */
 /* 14. EMPTY STATE (No Data Design)          */
 /* ========================================= */
-
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -544,13 +543,13 @@ input[type="date"] {
   font-size: 48px;
   margin-bottom: 12px;
   opacity: 0.8;
-  filter: grayscale(100%); /* Keeps it subtle */
+  filter: grayscale(100%);
   transition: transform 0.3s ease;
 }
 
 .empty-state:hover .empty-icon {
-  transform: scale(1.1) rotate(10deg); /* Playful hover effect */
-  filter: grayscale(0%); /* Brings color back on hover */
+  transform: scale(1.1) rotate(10deg);
+  filter: grayscale(0%);
 }
 
 .empty-title {
@@ -579,8 +578,8 @@ body.dark-mode .empty-state {
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dimmed background */
-  backdrop-filter: blur(3px);     /* Glass effect */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -620,27 +619,18 @@ body.dark-mode .empty-state {
   gap: 10px;
 }
 
-/* Dark Mode fixes are automatic because we used var(--card) */
-
 /* ========================================= */
 /* 16. DARK MODE FIX FOR MODAL               */
 /* ========================================= */
-
 body.dark-mode .modal-box {
-  background: #1e1e1e;       /* Matches your other dark cards */
-  border: 1px solid #333;    /* Adds a subtle border for definition */
+  background: #1e1e1e;
+  border: 1px solid #333;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
-body.dark-mode .modal-box h3 {
-  color: #ffffff !important; /* Forces the title to be White */
-}
+body.dark-mode .modal-box h3 { color: #ffffff !important; }
+body.dark-mode .modal-box p { color: #b0b0b0; }
 
-body.dark-mode .modal-box p {
-  color: #b0b0b0;            /* Light Grey for the description */
-}
-
-/* Fix for the "Cancel" button in dark mode to make it visible */
 body.dark-mode .modal-actions .secondary {
   background: #2d2d2d;
   color: #fff;
@@ -654,94 +644,84 @@ body.dark-mode .modal-actions .secondary:hover {
 /* ========================================= */
 /* 17. DATE FILTER BUTTONS FIX               */
 /* ========================================= */
-
 .filter-date-row {
-  grid-column: 1 / -1;    /* Spans the full width of the filter box */
-  display: flex;          /* Align items in a row */
-  gap: 10px;              /* Space between buttons */
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
-.filter-date-row button {
-  flex: 1;                /* Makes all 3 buttons equal width */
-}
+.filter-date-row button { flex: 1; }
 
-/* On Mobile: Stack them vertically (like in your screenshot) */
 @media (max-width: 768px) {
-  .filter-date-row {
-    flex-direction: column;
-  }
+  .filter-date-row { flex-direction: column; }
 }
 
 /* ========================================= */
 /* 18. SPLIT BUTTON LAYOUT                   */
 /* ========================================= */
-
 .export-container-split {
-    display: flex;
-    justify-content: space-between; /* Pushes groups to opposite sides */
-    align-items: center;
-    flex-wrap: wrap; /* Allows wrapping on mobile */
-    gap: 15px;
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0,0,0,0.05); /* Subtle divider line */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Internal groups should stick together */
 .left-actions, .right-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Dark Mode adjustment for the divider line */
 body.dark-mode .export-container-split {
-    border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-/* MOBILE FIX: Stack them vertically on small phones */
 @media (max-width: 600px) {
-    .export-container-split {
-        flex-direction: column;
-        align-items: stretch; /* Make buttons full width */
-    }
-    
-    .left-actions, .right-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .export-container-split button {
-        width: 100%;
-    }
+  .export-container-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .left-actions, .right-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .export-container-split button {
+    width: 100%;
+  }
 }
 
 /* Quick Add Chips */
 .quick-chips {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    align-items: center;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .chip-label { font-size: 12px; color: var(--muted); font-weight: 600; }
 
 .chip {
-    background: #eef2f5;
-    color: var(--accent-2);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    border: 1px solid transparent;
-    transition: all 0.2s;
+  background: #eef2f5;
+  color: var(--accent-2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
 }
 
 .chip:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateY(-2px);
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
 }
 
 body.dark-mode .chip { background: #333; color: #fff; }

@@ -10,7 +10,7 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
-// Helper
+// Helper: Animate Number
 function animateNumber({ from, to, duration, onUpdate }) {
   const start = performance.now();
 
@@ -72,11 +72,11 @@ document.body.appendChild(toastContainer);
 function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  
+
   let icon = 'ℹ️';
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '⚠️';
-  
+
   toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
   toastContainer.appendChild(toast);
 
@@ -154,7 +154,7 @@ function saveTransactions() {
 }
 
 function generateId() {
-  return Date.now(); 
+  return Date.now();
 }
 
 // 4. Add Transaction Logic
@@ -176,9 +176,9 @@ function addTransaction(e) {
   saveTransactions();
   renderTransactions();
   txForm.reset();
-  dateEl.value = new Date().toLocaleDateString('en-CA'); 
+  dateEl.value = new Date().toLocaleDateString('en-CA');
   updateCategoryOptions();
-  
+
   showToast('Transaction added successfully!', 'success');
 }
 
@@ -188,8 +188,8 @@ function deleteTransaction(id) {
   if (!tx) return;
 
   showConfirm(
-    'Delete Transaction?', 
-    `Are you sure you want to delete "${tx.description}"?`, 
+    'Delete Transaction?',
+    `Are you sure you want to delete "${tx.description}"?`,
     () => {
       transactions = transactions.filter(t => t.id !== Number(id));
       saveTransactions();
@@ -208,21 +208,21 @@ function editTransaction(id) {
   if (!transaction) return;
   isEditing = true;
   editingId = id;
-  
+
   descriptionEl.value = transaction.description;
   amountEl.value = transaction.amount;
   typeEl.value = transaction.type;
   dateEl.value = transaction.date;
   updateCategoryOptions();
   categoryEl.value = transaction.category;
-  
+
   const addBtn = document.getElementById('add-btn');
   addBtn.textContent = 'Update Transaction';
   addBtn.classList.add('secondary');
   descriptionEl.focus();
 }
 
-txForm.addEventListener('submit', function (e) {
+txForm.addEventListener('submit', function(e) {
   if (isEditing) {
     e.preventDefault();
     updateTransaction();
@@ -239,20 +239,20 @@ function updateTransaction() {
     transactions[index].category = categoryEl.value;
     transactions[index].date = dateEl.value;
     transactions[index].type = typeEl.value;
-    
+
     saveTransactions();
     renderTransactions();
-    
+
     isEditing = false;
     editingId = null;
     txForm.reset();
-    
+
     const addBtn = document.getElementById('add-btn');
     addBtn.textContent = 'Add Transaction';
     addBtn.classList.remove('secondary');
-    
-    dateEl.value = new Date().toISOString().slice(0, 10); 
-    updateCategoryOptions(); 
+
+    dateEl.value = new Date().toISOString().slice(0, 10);
+    updateCategoryOptions();
   }
 }
 
@@ -275,12 +275,12 @@ function renderTransactions(txs) {
     updateCharts();
     return;
   }
-  
+
   txs.forEach(t => {
     const li = document.createElement('li');
-    li.classList.add(t.type); 
+    li.classList.add(t.type);
     const sign = t.type === TYPE_EXPENSE ? '-' : '+';
-    
+
     li.innerHTML = `
       <div class="tx-left">
           <div class="tx-details">
@@ -298,12 +298,12 @@ function renderTransactions(txs) {
           <button class="delete-btn" data-id="${t.id}">✖</button>
       </div>
     `;
-    
+
     li.querySelector('.delete-btn').addEventListener('click', () => deleteTransaction(t.id));
     li.querySelector('.edit-btn').addEventListener('click', () => editTransaction(t.id));
     listEl.appendChild(li);
   });
-  
+
   updateBalance();
   updateCharts();
 }
@@ -312,14 +312,14 @@ function updateBalance() {
   const income = transactions.filter(t => t.type === TYPE_INCOME).reduce((acc, t) => acc + t.amount, 0);
   const expense = transactions.filter(t => t.type === TYPE_EXPENSE).reduce((acc, t) => acc + t.amount, 0);
   const total = income - expense;
-  
+
   incomeEl.textContent = formatCurrency(income);
   incomeEl.className = 'value value-income';
   expenseEl.textContent = formatCurrency(expense);
   expenseEl.className = 'value value-expense';
   balanceEl.textContent = formatCurrency(total);
   balanceEl.className = total < 0 ? 'value value-expense' : 'value value-income';
-  
+
   // Budget Logic
   let budgetLimit = Number(localStorage.getItem('budgetLimit')) || 0;
   const budgetBar = document.getElementById('budget-bar');
@@ -330,7 +330,7 @@ function updateBalance() {
     const percent = Math.min((expense / budgetLimit) * 100, 100);
     budgetBar.style.width = `${percent}%`;
     budgetVal.textContent = `Limit: ${formatCurrency(budgetLimit)}`;
-    
+
     if (expense > budgetLimit) {
       budgetBar.style.backgroundColor = '#e63946'; // Red
       budgetText.innerHTML = `⚠️ Over Budget! (${Math.round((expense/budgetLimit)*100)}%)`;
@@ -352,132 +352,143 @@ function updateBalance() {
   }
 }
 
-// 8. Chart Logic (UPDATED: Fixed Text Overlap)
+// 8. Chart Logic
 function updateCharts() {
   // --- 1. PREPARE DATA ---
   const expenseItems = transactions.filter(t => t.type === TYPE_EXPENSE);
   const catMap = {};
-  let totalExpense = 0; 
+  let totalExpense = 0;
 
-  expenseItems.forEach(t => { 
+  expenseItems.forEach(t => {
     const val = Number(t.amount);
-    catMap[t.category] = (catMap[t.category] || 0) + val; 
+    catMap[t.category] = (catMap[t.category] || 0) + val;
     totalExpense += val;
   });
-  
+
   const pieLabels = Object.keys(catMap);
   const pieData = Object.values(catMap);
 
-
   // Check Theme for Dynamic Colors
   const isDark = document.body.classList.contains('dark-mode');
-  const cardBg = isDark ? '#1e1e1e' : '#ffffff'; 
+  const cardBg = isDark ? '#1e1e1e' : '#ffffff';
   const textColor = isDark ? '#e0e0e0' : '#333333';
 
   // --- 2. DOUGHNUT CHART ---
-  if (pieChart) { pieChart.destroy(); }
-  
+  if (pieChart) {
+    pieChart.destroy();
+  }
+
   pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
     type: 'doughnut',
     data: {
       labels: pieLabels.length ? pieLabels : ['No data'],
       datasets: [{
         data: pieData.length ? pieData : [1],
-        backgroundColor: pieData.length 
-          ? ['#ff6b6b','#4ecdc4','#ffe66d','#1a535c','#ff9f1c','#2a9d8f'] 
-          : ['#e2e8f0'], 
+        backgroundColor: pieData.length ?
+          ['#ff6b6b', '#4ecdc4', '#ffe66d', '#1a535c', '#ff9f1c', '#2a9d8f'] : ['#e2e8f0'],
         borderColor: cardBg,
         borderWidth: 3,
-        hoverOffset: 4,     
-        borderRadius: 4,     
-        cutout: '68%',       
+        hoverOffset: 4,
+        borderRadius: 4,
+        cutout: '68%',
       }]
     },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false, 
-      animation: { animateScale: true, animateRotate: true },
-      layout: { padding: 10 },
-      plugins: { 
-        legend: { 
-          position: 'right', 
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        animateScale: true,
+        animateRotate: true
+      },
+      layout: {
+        padding: 10
+      },
+      plugins: {
+        legend: {
+          position: 'right',
           labels: {
             color: textColor,
             usePointStyle: true,
             boxWidth: 8,
-            font: { family: "'Poppins', sans-serif", size: 11 }
+            font: {
+              family: "'Poppins', sans-serif",
+              size: 11
+            }
           }
         },
         tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            callbacks: {
-                label: function(context) {
-                    let label = context.label || '';
-                    if (label) { label += ': '; }
-                    if (context.parsed !== null) {
-                        label += formatCurrency(context.parsed);
-                    }
-                    return label;
-                }
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          callbacks: {
+            label: function(context) {
+              let label = context.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed !== null) {
+                label += formatCurrency(context.parsed);
+              }
+              return label;
             }
+          }
         }
-      } 
+      }
     },
-     plugins: [{
+    plugins: [{
       id: 'textCenter',
       beforeDraw(chart) {
-  if (!pieData.length) return;
+        if (!pieData.length) return;
 
-  const ctx = chart.ctx;
-  const { left, right, top, bottom } = chart.chartArea;
+        const ctx = chart.ctx;
+        const { left, right, top, bottom } = chart.chartArea;
 
-  const centerX = left + (right - left) / 2;
-  const centerY = top + (bottom - top) / 2;
+        const centerX = left + (right - left) / 2;
+        const centerY = top + (bottom - top) / 2;
 
-  ctx.save();
+        ctx.save();
 
-  // Label
-  ctx.font = "500 13px Poppins";
-  ctx.fillStyle = "#888";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("Total", centerX, centerY - 16);
+        // Label
+        ctx.font = "500 13px Poppins";
+        ctx.fillStyle = "#888";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Total", centerX, centerY - 16);
 
-  // Amount (animated)
-  ctx.font = "700 18px Poppins";
-  ctx.fillStyle = chart.options.plugins.legend.labels.color;
-  ctx.fillText(
-    formatCurrency(Math.round(animatedTotal)),
-    centerX,
-    centerY + 10
-  );
+        // Amount (animated)
+        ctx.font = "700 18px Poppins";
+        ctx.fillStyle = chart.options.plugins.legend.labels.color;
+        ctx.fillText(
+          formatCurrency(Math.round(animatedTotal)),
+          centerX,
+          centerY + 10
+        );
 
-  ctx.restore();
-}
+        ctx.restore();
+      }
     }]
   });
-  
-animatedTotal = 0;
 
-animateNumber({
-  from: animatedTotal,
-  to: totalExpense,
-  duration: 900,
-  onUpdate: (val) => {
-    animatedTotal = val;
-    pieChart.draw();
-  }
-});
+  animatedTotal = 0;
+
+  animateNumber({
+    from: animatedTotal,
+    to: totalExpense,
+    duration: 900,
+    onUpdate: (val) => {
+      animatedTotal = val;
+      pieChart.draw();
+    }
+  });
+
   // --- 3. GRADIENT LINE CHART ---
   const dateMap = {};
-  const sorted = transactions.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+  const sorted = transactions.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
   let running = 0;
-  
+
   sorted.forEach(t => {
     running += (t.type === TYPE_INCOME ? Number(t.amount) : -Number(t.amount));
-    dateMap[t.date] = running; 
+    dateMap[t.date] = running;
   });
-  
+
   const lineLabels = Object.keys(dateMap);
   const lineData = Object.values(dateMap);
 
@@ -486,48 +497,63 @@ animateNumber({
   gradient.addColorStop(0, 'rgba(42, 157, 143, 0.5)');
   gradient.addColorStop(1, 'rgba(42, 157, 143, 0.0)');
 
-  if (lineChart) { lineChart.destroy(); }
+  if (lineChart) {
+    lineChart.destroy();
+  }
   lineChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: lineLabels.length ? lineLabels : ['No data'],
       datasets: [{
-        label: 'Balance', 
-        data: lineData.length ? lineData : [0], 
+        label: 'Balance',
+        data: lineData.length ? lineData : [0],
         fill: true,
         backgroundColor: gradient,
         borderColor: '#2a9d8f',
         borderWidth: 2,
         tension: 0.4,
         pointRadius: 4,
-        pointBackgroundColor: cardBg, 
+        pointBackgroundColor: cardBg,
         pointBorderColor: '#2a9d8f'
       }]
     },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false, 
-      animation: { duration: 800, easing: 'easeOutQuart' },
-      plugins: { 
-        legend: { display: false },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 800,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
         tooltip: {
-            mode: 'index',
-            intersect: false,
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            titleColor: '#fff',
-            bodyColor: '#fff'
+          mode: 'index',
+          intersect: false,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff'
         }
       },
       scales: {
-          x: { 
-            grid: { display: false }, 
-            ticks: { color: textColor } 
+        x: {
+          grid: {
+            display: false
           },
-          y: { 
-            beginAtZero: false,
-            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' },
-            ticks: { color: textColor }
+          ticks: {
+            color: textColor
           }
+        },
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+          },
+          ticks: {
+            color: textColor
+          }
+        }
       }
     }
   });
@@ -537,24 +563,24 @@ function updateCategoryOptions() {
   const currentType = document.getElementById('type').value;
   const cats = categories[currentType];
   const catSelect = document.getElementById('category');
-  
+
   catSelect.innerHTML = '<option value="" disabled selected>Select Category</option>';
-  
+
   cats.forEach(cat => {
     const option = document.createElement('option');
-    option.value = cat; 
-    option.textContent = cat; 
+    option.value = cat;
+    option.textContent = cat;
     catSelect.appendChild(option);
   });
-  
+
   const filterCat = document.getElementById('filter-category');
   filterCat.innerHTML = '<option value="all">All Categories</option>';
-  
+
   const allCats = [...new Set([...categories[TYPE_EXPENSE], ...categories[TYPE_INCOME]])].sort();
   allCats.forEach(cat => {
     const option = document.createElement('option');
-    option.value = cat; 
-    option.textContent = cat; 
+    option.value = cat;
+    option.textContent = cat;
     filterCat.appendChild(option);
   });
 }
@@ -565,7 +591,7 @@ function applyFilters() {
   const cat = filterCategory.value;
   const from = filterFrom.value ? new Date(filterFrom.value) : null;
   const to = filterTo.value ? new Date(filterTo.value) : null;
-  
+
   const filtered = transactions.filter(t => {
     if (sText && !t.description.toLowerCase().includes(sText)) return false;
     if (cat !== 'all' && t.category !== cat) return false;
@@ -573,8 +599,8 @@ function applyFilters() {
     if (from && tDate < from) return false;
     if (to && tDate > to) return false;
     return true;
-  }).sort((a,b) => new Date(b.date) - new Date(a.date));
-  
+  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
   renderTransactions(filtered);
 }
 
@@ -583,33 +609,35 @@ function clearFilters() {
   filterCategory.value = 'all';
   filterFrom.value = '';
   filterTo.value = '';
-  renderTransactions(transactions); 
+  renderTransactions(transactions);
   showToast('Filters cleared', 'info');
 }
 
 function exportToCsv() {
-  if (!transactions.length) { 
-    showToast('No data available to export!', 'error'); 
-    return; 
+  if (!transactions.length) {
+    showToast('No data available to export!', 'error');
+    return;
   }
-  
-  const header = ['id','date','description','category','type','amount'];
+
+  const header = ['id', 'date', 'description', 'category', 'type', 'amount'];
   const rows = transactions.map(t => [
-    t.id, 
-    t.date, 
-    `"${t.description.replace(/"/g,'""')}"`, 
-    t.category, 
-    t.type, 
+    t.id,
+    t.date,
+    `"${t.description.replace(/"/g,'""')}"`,
+    t.category,
+    t.type,
     t.amount
   ]);
-  
+
   const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  const url = URL.createObjectURL(new Blob([csv], {
+    type: 'text/csv;charset=utf-8;'
+  }));
   const a = document.createElement('a');
-  a.href = url; 
+  a.href = url;
   a.download = `expense_tracker_${new Date().toLocaleDateString('en-CA')}.csv`;
   a.click();
-  
+
   showToast('CSV file downloaded!', 'success');
 }
 
@@ -617,18 +645,31 @@ function downloadPdf() {
   window.scrollTo(0, 0);
   const element = document.getElementById('report-area');
   const balanceCards = document.querySelector('.balance-container');
-  element.classList.add('printing'); 
-  
+  element.classList.add('printing');
+
   const titleDiv = document.createElement('div');
   titleDiv.innerHTML = `<h1 style="text-align:center;color:#000;">Expense Report</h1><p style="text-align:center;color:#444;">${new Date().toLocaleDateString()}</p><hr style="margin-bottom:20px;">`;
-  
+
   const summaryClone = balanceCards.cloneNode(true);
   element.prepend(summaryClone);
   element.prepend(titleDiv);
 
   html2pdf().set({
-    margin: 0.3, filename: `Expense_Report.pdf`, image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 1, useCORS: true, scrollY: 0 }, jsPDF: { unit: 'in', format: 'a4' }
+    margin: 0.3,
+    filename: `Expense_Report.pdf`,
+    image: {
+      type: 'jpeg',
+      quality: 0.98
+    },
+    html2canvas: {
+      scale: 1,
+      useCORS: true,
+      scrollY: 0
+    },
+    jsPDF: {
+      unit: 'in',
+      format: 'a4'
+    }
   }).from(element).save().then(() => {
     element.classList.remove('printing');
     element.removeChild(titleDiv);
@@ -637,23 +678,23 @@ function downloadPdf() {
 }
 
 function clearAllData() {
-  if (confirm('Are you sure you want to Clear ALL data? This cannot be undone.')) { 
-    transactions = []; 
-    saveTransactions(); 
-    renderTransactions(); 
+  if (confirm('Are you sure you want to Clear ALL data? This cannot be undone.')) {
+    transactions = [];
+    saveTransactions();
+    renderTransactions();
     showToast('All data has been cleared.', 'info');
   }
 }
 
-resetBtn.addEventListener('click', () => { 
-  txForm.reset(); 
-  dateEl.value = new Date().toISOString().slice(0, 10); 
-  isEditing = false; 
+resetBtn.addEventListener('click', () => {
+  txForm.reset();
+  dateEl.value = new Date().toISOString().slice(0, 10);
+  isEditing = false;
   editingId = null;
   const addBtn = document.getElementById('add-btn');
   addBtn.textContent = 'Add Transaction';
   addBtn.classList.remove('secondary');
-  updateCategoryOptions(); 
+  updateCategoryOptions();
 });
 
 // 10. Event Listeners
@@ -664,12 +705,12 @@ downloadPdfBtn.addEventListener('click', downloadPdf);
 
 clearAllBtn.addEventListener('click', () => {
   showConfirm(
-    'Clear All Data?', 
-    'This will permanently delete all transactions. This action cannot be undone.', 
+    'Clear All Data?',
+    'This will permanently delete all transactions. This action cannot be undone.',
     () => {
-      transactions = []; 
-      saveTransactions(); 
-      renderTransactions(); 
+      transactions = [];
+      saveTransactions();
+      renderTransactions();
       showToast('All data has been cleared.', 'info');
     }
   );
@@ -680,9 +721,9 @@ document.getElementById('search-text').addEventListener('input', applyFilters);
 
 // Dark Mode Logic
 const themeBtn = document.getElementById('theme-toggle');
-if (localStorage.getItem('theme') === 'dark') { 
-  document.body.classList.add('dark-mode'); 
-  themeBtn.textContent = '☀️ Light Mode'; 
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark-mode');
+  themeBtn.textContent = '☀️ Light Mode';
 }
 
 themeBtn.addEventListener('click', () => {
@@ -697,10 +738,10 @@ themeBtn.addEventListener('click', () => {
 document.getElementById('set-budget-btn').addEventListener('click', () => {
   const currentLimit = localStorage.getItem('budgetLimit') || 0;
   const input = prompt("Enter your monthly budget limit (₹):", currentLimit);
-  
+
   if (input !== null && !isNaN(input) && Number(input) > 0) {
     localStorage.setItem('budgetLimit', input);
-    updateBalance(); 
+    updateBalance();
     showToast(`Budget limit set to ₹${input}`, 'success');
   } else if (input !== null) {
     showToast('Please enter a valid number!', 'error');
@@ -712,7 +753,7 @@ document.getElementById('reset-budget-btn').addEventListener('click', () => {
     showToast('No budget limit to reset!', 'info');
     return;
   }
-  
+
   showConfirm(
     'Remove Budget?',
     'Are you sure you want to remove the monthly budget limit?',
@@ -728,13 +769,13 @@ document.getElementById('reset-budget-btn').addEventListener('click', () => {
 document.getElementById('add-cat-btn').addEventListener('click', () => {
   const currentType = document.getElementById('type').value;
   const newCat = prompt(`Enter new ${currentType} category name:`);
-  
+
   if (newCat && newCat.trim() !== "") {
     const formattedCat = newCat.trim();
     if (!categories[currentType].includes(formattedCat)) {
-      categories[currentType].push(formattedCat); 
-      saveCategories(); 
-      updateCategoryOptions(); 
+      categories[currentType].push(formattedCat);
+      saveCategories();
+      updateCategoryOptions();
       document.getElementById('category').value = formattedCat;
       showToast(`Category "${formattedCat}" added!`, 'success');
     } else {
@@ -764,9 +805,9 @@ document.getElementById('del-cat-btn').addEventListener('click', () => {
     () => {
       const index = categories[currentType].indexOf(selectedCat);
       if (index > -1) {
-        categories[currentType].splice(index, 1); 
-        saveCategories(); 
-        updateCategoryOptions(); 
+        categories[currentType].splice(index, 1);
+        saveCategories();
+        updateCategoryOptions();
         showToast(`Category "${selectedCat}" removed.`, 'info');
       }
     }
@@ -791,7 +832,7 @@ function setDateFilter(range) {
     end = new Date();
     start = new Date();
     start.setDate(end.getDate() - 30);
-    label = "Last 30 Days"; 
+    label = "Last 30 Days";
   }
 
   const fmt = (d) => {
@@ -801,7 +842,7 @@ function setDateFilter(range) {
 
   document.getElementById('filter-from').value = fmt(start);
   document.getElementById('filter-to').value = fmt(end);
-  
+
   applyFilters();
   showToast(`Showing data for: ${label}`, 'info');
 }
@@ -826,7 +867,7 @@ document.getElementById('btn-backup').addEventListener('click', () => {
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
-  
+
   showToast('Backup file saved successfully!', 'success');
 });
 
@@ -836,7 +877,7 @@ document.getElementById('btn-restore').addEventListener('click', () => {
   showConfirm(
     'Restore Data?',
     'This will OVERWRITE your current data with the backup file. Are you sure?',
-    () => fileInput.click() 
+    () => fileInput.click()
   );
 });
 
@@ -860,11 +901,11 @@ fileInput.addEventListener('change', function(event) {
 
       saveTransactions();
       saveCategories();
-      
+
       renderTransactions();
       updateCategoryOptions();
       updateBalance();
-      
+
       showToast('Data restored successfully!', 'success');
     } catch (err) {
       console.error(err);
@@ -880,7 +921,7 @@ fileInput.addEventListener('change', function(event) {
 // =========================================
 document.addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement !== descriptionEl) {
-    e.preventDefault(); 
+    e.preventDefault();
     document.getElementById('search-text').focus();
   }
 
@@ -890,18 +931,18 @@ document.addEventListener('keydown', (e) => {
       return;
     }
     clearFilters();
-    document.activeElement.blur(); 
+    document.activeElement.blur();
   }
 });
 
 // Helper: Quick Fill Form
 function quickFill(desc, amount, cat) {
-    document.getElementById('description').value = desc;
-    document.getElementById('amount').value = amount;
-    
-    document.getElementById('type').value = 'expense';
-    updateCategoryOptions(); 
-    document.getElementById('category').value = cat;
+  document.getElementById('description').value = desc;
+  document.getElementById('amount').value = amount;
+
+  document.getElementById('type').value = 'expense';
+  updateCategoryOptions();
+  document.getElementById('category').value = cat;
 }
 
 // Initial Load
