@@ -10,6 +10,25 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// Helper
+function animateNumber({ from, to, duration, onUpdate }) {
+  const start = performance.now();
+
+  function frame(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    const value = from + (to - from) * eased;
+
+    onUpdate(value);
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
 // --- CUSTOM MODAL SYSTEM ---
 const modal = document.getElementById('confirm-modal');
 const modalTitle = document.getElementById('modal-title');
@@ -93,9 +112,9 @@ const resetBtn = document.getElementById('reset-btn');
 
 let pieChart = null;
 let lineChart = null;
+let animatedTotal = 0;
 
 // 2. Category Configuration
-// IMPROVEMENT: Use the constants here so it matches the rest of the code
 const defaultCategories = {
   [TYPE_EXPENSE]: ['Food', 'Travel', 'Books', 'Stationery', 'Entertainment', 'General', 'Other'],
   [TYPE_INCOME]: ['Pocket Money', 'Part-Time Job', 'Gift', 'Refund', 'Other Income']
@@ -134,7 +153,6 @@ function saveTransactions() {
   localStorage.setItem('transactions', JSON.stringify(transactions));
 }
 
-// IMPROVEMENT: Use Date.now() for unique IDs instead of Math.random()
 function generateId() {
   return Date.now(); 
 }
@@ -164,20 +182,15 @@ function addTransaction(e) {
   showToast('Transaction added successfully!', 'success');
 }
 
-// 5. Delete Transaction (Updated with Confirmation)
+// 5. Delete Transaction
 function deleteTransaction(id) {
-  // 1. Find the transaction first so we can show its name
   const tx = transactions.find(t => t.id === Number(id));
-  
-  // Safety check: if not found, stop
   if (!tx) return;
 
-  // 2. Show the Custom Confirmation Modal
   showConfirm(
     'Delete Transaction?', 
     `Are you sure you want to delete "${tx.description}"?`, 
     () => {
-      // 3. This code runs ONLY if they click "Yes"
       transactions = transactions.filter(t => t.id !== Number(id));
       saveTransactions();
       renderTransactions();
@@ -258,8 +271,6 @@ function renderTransactions(txs) {
         <div class="empty-desc">Start by adding your income or expenses above to see your analytics.</div>
       </div>
     `;
-    // We return here so we don't try to loop through empty data
-    // Important: Update balance/charts to show 0 before returning
     updateBalance();
     updateCharts();
     return;
@@ -267,7 +278,6 @@ function renderTransactions(txs) {
   
   txs.forEach(t => {
     const li = document.createElement('li');
-    // Ensure we use the right class for CSS styling
     li.classList.add(t.type); 
     const sign = t.type === TYPE_EXPENSE ? '-' : '+';
     
@@ -299,7 +309,6 @@ function renderTransactions(txs) {
 }
 
 function updateBalance() {
-  // IMPROVED: Use Constants for type checking
   const income = transactions.filter(t => t.type === TYPE_INCOME).reduce((acc, t) => acc + t.amount, 0);
   const expense = transactions.filter(t => t.type === TYPE_EXPENSE).reduce((acc, t) => acc + t.amount, 0);
   const total = income - expense;
@@ -343,39 +352,128 @@ function updateBalance() {
   }
 }
 
-// 8. Chart Logic
+// 8. Chart Logic (UPDATED: Fixed Text Overlap)
 function updateCharts() {
-  // IMPROVED: Use Constants
+  // --- 1. PREPARE DATA ---
   const expenseItems = transactions.filter(t => t.type === TYPE_EXPENSE);
   const catMap = {};
-  expenseItems.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount); });
+  let totalExpense = 0; 
+
+  expenseItems.forEach(t => { 
+    const val = Number(t.amount);
+    catMap[t.category] = (catMap[t.category] || 0) + val; 
+    totalExpense += val;
+  });
   
   const pieLabels = Object.keys(catMap);
   const pieData = Object.values(catMap);
 
+
+  // Check Theme for Dynamic Colors
+  const isDark = document.body.classList.contains('dark-mode');
+  const cardBg = isDark ? '#1e1e1e' : '#ffffff'; 
+  const textColor = isDark ? '#e0e0e0' : '#333333';
+
+  // --- 2. DOUGHNUT CHART ---
   if (pieChart) { pieChart.destroy(); }
+  
   pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: pieLabels.length ? pieLabels : ['No data'],
       datasets: [{
         data: pieData.length ? pieData : [1],
-        backgroundColor: pieData.length ? ['#ff6b6b','#ffd166','#06d6a0','#4d96ff','#9b5de5','#f15bb5'] : ['#e2e8f0'], 
-        borderWidth: 0
+        backgroundColor: pieData.length 
+          ? ['#ff6b6b','#4ecdc4','#ffe66d','#1a535c','#ff9f1c','#2a9d8f'] 
+          : ['#e2e8f0'], 
+        borderColor: cardBg,
+        borderWidth: 3,
+        hoverOffset: 4,     
+        borderRadius: 4,     
+        cutout: '68%',       
       }]
     },
     options: { 
-      responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, 
-      plugins: { legend: { position: 'bottom' } } 
-    }
-  });
+      responsive: true, 
+      maintainAspectRatio: false, 
+      animation: { animateScale: true, animateRotate: true },
+      layout: { padding: 10 },
+      plugins: { 
+        legend: { 
+          position: 'right', 
+          labels: {
+            color: textColor,
+            usePointStyle: true,
+            boxWidth: 8,
+            font: { family: "'Poppins', sans-serif", size: 11 }
+          }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            callbacks: {
+                label: function(context) {
+                    let label = context.label || '';
+                    if (label) { label += ': '; }
+                    if (context.parsed !== null) {
+                        label += formatCurrency(context.parsed);
+                    }
+                    return label;
+                }
+            }
+        }
+      } 
+    },
+     plugins: [{
+      id: 'textCenter',
+      beforeDraw(chart) {
+  if (!pieData.length) return;
 
+  const ctx = chart.ctx;
+  const { left, right, top, bottom } = chart.chartArea;
+
+  const centerX = left + (right - left) / 2;
+  const centerY = top + (bottom - top) / 2;
+
+  ctx.save();
+
+  // Label
+  ctx.font = "500 13px Poppins";
+  ctx.fillStyle = "#888";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Total", centerX, centerY - 16);
+
+  // Amount (animated)
+  ctx.font = "700 18px Poppins";
+  ctx.fillStyle = chart.options.plugins.legend.labels.color;
+  ctx.fillText(
+    formatCurrency(Math.round(animatedTotal)),
+    centerX,
+    centerY + 10
+  );
+
+  ctx.restore();
+}
+    }]
+  });
+  
+animatedTotal = 0;
+
+animateNumber({
+  from: animatedTotal,
+  to: totalExpense,
+  duration: 900,
+  onUpdate: (val) => {
+    animatedTotal = val;
+    pieChart.draw();
+  }
+});
+  // --- 3. GRADIENT LINE CHART ---
   const dateMap = {};
   const sorted = transactions.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   let running = 0;
   
   sorted.forEach(t => {
-    // IMPROVED: Use Constants
     running += (t.type === TYPE_INCOME ? Number(t.amount) : -Number(t.amount));
     dateMap[t.date] = running; 
   });
@@ -383,19 +481,54 @@ function updateCharts() {
   const lineLabels = Object.keys(dateMap);
   const lineData = Object.values(dateMap);
 
+  const ctx = document.getElementById('lineChart').getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(42, 157, 143, 0.5)');
+  gradient.addColorStop(1, 'rgba(42, 157, 143, 0.0)');
+
   if (lineChart) { lineChart.destroy(); }
-  lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
+  lineChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: lineLabels.length ? lineLabels : ['No data'],
       datasets: [{
-        label: 'Balance', data: lineData.length ? lineData : [0], fill: true,
-        backgroundColor: 'rgba(42,157,143,0.12)', borderColor: '#2a9d8f', tension: 0.25, pointRadius: 3
+        label: 'Balance', 
+        data: lineData.length ? lineData : [0], 
+        fill: true,
+        backgroundColor: gradient,
+        borderColor: '#2a9d8f',
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: cardBg, 
+        pointBorderColor: '#2a9d8f'
       }]
     },
     options: { 
-      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
-      scales: { y: { beginAtZero: false } }, plugins: { legend: { display: false } } 
+      responsive: true, 
+      maintainAspectRatio: false, 
+      animation: { duration: 800, easing: 'easeOutQuart' },
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff'
+        }
+      },
+      scales: {
+          x: { 
+            grid: { display: false }, 
+            ticks: { color: textColor } 
+          },
+          y: { 
+            beginAtZero: false,
+            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' },
+            ticks: { color: textColor }
+          }
+      }
     }
   });
 }
@@ -417,7 +550,6 @@ function updateCategoryOptions() {
   const filterCat = document.getElementById('filter-category');
   filterCat.innerHTML = '<option value="all">All Categories</option>';
   
-  // Combine all unique categories
   const allCats = [...new Set([...categories[TYPE_EXPENSE], ...categories[TYPE_INCOME]])].sort();
   allCats.forEach(cat => {
     const option = document.createElement('option');
@@ -451,10 +583,8 @@ function clearFilters() {
   filterCategory.value = 'all';
   filterFrom.value = '';
   filterTo.value = '';
-  
-  // FIX: Explicitly pass null or the full list to ensure it resets
   renderTransactions(transactions); 
-  showToast('Filters cleared', 'info'); // Nice feedback
+  showToast('Filters cleared', 'info');
 }
 
 function exportToCsv() {
@@ -537,7 +667,6 @@ clearAllBtn.addEventListener('click', () => {
     'Clear All Data?', 
     'This will permanently delete all transactions. This action cannot be undone.', 
     () => {
-      // This code runs only if they click "Yes"
       transactions = []; 
       saveTransactions(); 
       renderTransactions(); 
@@ -561,6 +690,7 @@ themeBtn.addEventListener('click', () => {
   const isDark = document.body.classList.contains('dark-mode');
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
   themeBtn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  updateCharts();
 });
 
 // Budget Setting
@@ -703,11 +833,10 @@ document.getElementById('btn-backup').addEventListener('click', () => {
 // B. Restore Data (Trigger Input)
 const fileInput = document.getElementById('import-file');
 document.getElementById('btn-restore').addEventListener('click', () => {
-  // Show warning before overwriting
   showConfirm(
     'Restore Data?',
     'This will OVERWRITE your current data with the backup file. Are you sure?',
-    () => fileInput.click() // Trigger the hidden file input
+    () => fileInput.click() 
   );
 });
 
@@ -721,21 +850,17 @@ fileInput.addEventListener('change', function(event) {
     try {
       const importedData = JSON.parse(e.target.result);
 
-      // Basic Validation: Check if it has transactions array
       if (!Array.isArray(importedData.transactions)) {
         throw new Error("Invalid file format");
       }
 
-      // Restore Data
       transactions = importedData.transactions;
       if (importedData.categories) categories = importedData.categories;
       if (importedData.budgetLimit) localStorage.setItem('budgetLimit', importedData.budgetLimit);
 
-      // Save to LocalStorage
       saveTransactions();
       saveCategories();
       
-      // Update UI
       renderTransactions();
       updateCategoryOptions();
       updateBalance();
@@ -745,7 +870,6 @@ fileInput.addEventListener('change', function(event) {
       console.error(err);
       showToast('Error: Invalid Backup File', 'error');
     }
-    // Clear input so same file can be selected again if needed
     fileInput.value = '';
   };
   reader.readAsText(file);
@@ -755,22 +879,18 @@ fileInput.addEventListener('change', function(event) {
 // 12. KEYBOARD SHORTCUTS
 // =========================================
 document.addEventListener('keydown', (e) => {
-  // 1. Press "/" to Search
   if (e.key === '/' && document.activeElement !== descriptionEl) {
-    e.preventDefault(); // Prevent typing "/"
+    e.preventDefault(); 
     document.getElementById('search-text').focus();
   }
 
-  // 2. Press "Esc" to Clear Search/Filters or Close Modal
   if (e.key === 'Escape') {
-    // If modal is open, close it
     if (modal.classList.contains('active')) {
       closeConfirm();
       return;
     }
-    // Otherwise clear filters
     clearFilters();
-    document.activeElement.blur(); // Remove focus
+    document.activeElement.blur(); 
   }
 });
 
@@ -779,9 +899,8 @@ function quickFill(desc, amount, cat) {
     document.getElementById('description').value = desc;
     document.getElementById('amount').value = amount;
     
-    // Auto-select type based on logic (usually expense for these chips)
     document.getElementById('type').value = 'expense';
-    updateCategoryOptions(); // Refresh categories
+    updateCategoryOptions(); 
     document.getElementById('category').value = cat;
 }
 

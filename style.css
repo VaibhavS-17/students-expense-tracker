@@ -289,7 +289,7 @@ button.danger { background: var(--danger); }
 .analytics { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .chart-card {
   flex: 1 1 320px;
-  min-height: 220px;
+  min-height: 260px;
   background: #fff;
   border-radius: 10px;
   padding: 10px;
