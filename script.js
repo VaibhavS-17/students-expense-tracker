@@ -774,6 +774,17 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Helper: Quick Fill Form
+function quickFill(desc, amount, cat) {
+    document.getElementById('description').value = desc;
+    document.getElementById('amount').value = amount;
+    
+    // Auto-select type based on logic (usually expense for these chips)
+    document.getElementById('type').value = 'expense';
+    updateCategoryOptions(); // Refresh categories
+    document.getElementById('category').value = cat;
+}
+
 // Initial Load
 updateCategoryOptions();
 renderTransactions();
