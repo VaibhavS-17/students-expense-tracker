@@ -92,7 +92,13 @@
                             <input type="date" id="date" required />
                         </div>
                     </div>
-
+                    <div id="quick-add-container" class="quick-chips">
+                        <span class="chip-label">Quick Add:</span>
+                        <button type="button" class="chip" onclick="quickFill('Lunch', 50, 'Food')">🍔 Lunch</button>
+                        <button type="button" class="chip" onclick="quickFill('Bus Ticket', 20, 'Travel')">Bus</button>
+                        <button type="button" class="chip" onclick="quickFill('Coffee', 30, 'Food')">☕ Coffee</button>
+                        <button type="button" class="chip" onclick="quickFill('Printout', 10, 'Stationery')">📄 Print</button>
+                    </div>
                     <div class="row">
                         <div>
                             <label for="description">Description</label>
