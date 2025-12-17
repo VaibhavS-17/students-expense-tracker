@@ -64,9 +64,11 @@ To run this project on your local machine:
 
 ## 🔮 Future Scope
 
-* **Cloud Sync:** Integration with Firebase/MongoDB for multi-device sync.
-* **AI Insights:** Machine learning to predict next month's expenses.
-* **OCR Scanning:** Scan receipts to auto-fill transaction details.
+* **☁️ Cloud Sync & Multi-User Support:** Migrating from LocalStorage to a cloud database (Firebase/MongoDB) to allow users to access their data across multiple devices and support group accounts.
+* **🤝 Group Expense Splitting:** Implementing a "Split Bill" feature for students to manage shared costs (canteens, projects, trips) and track debts.
+* **🤖 AI-Powered Insights:** Using Machine Learning to predict next month's budget based on historical spending patterns and suggesting areas to save money.
+* **🗣️ Voice Commands:** Integrating the Web Speech API to allow users to add transactions via voice (e.g., *"Spent 100 on Travel"*).
+* **📄 Automated Receipt Scanning:** Integration of OCR (Optical Character Recognition) to scan physical bills and automatically extract the date, amount, and category.
 
 ## 👥 Project Members
 
