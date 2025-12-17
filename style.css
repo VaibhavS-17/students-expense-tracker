@@ -97,6 +97,39 @@ body {
   cursor: default;
 }
 
+.summary-card p {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.summary-card {
+  text-align: left;
+}
+
+.summary-card h4 {
+  margin-bottom: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.summary-row span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.summary-row strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
 .card:hover {
   box-shadow: 0 10px 30px rgba(20, 30, 40, 0.12);
   transform: translateY(-2px);
@@ -356,7 +389,22 @@ body.dark-mode .small-note { color: #bbb; }
 .printing .value-expense, .printing .tx-amount.expense { color: #e63946 !important; font-weight: 800 !important; }
 .printing #list li { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; break-inside: avoid; }
 .printing .chart-card { box-shadow: none; border: 1px solid #ddd; height: 300px !important; page-break-inside: avoid; }
+.printing {
+  page-break-inside: avoid;
+}
 
+.printing .chart-card,
+.printing #list li {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.printing .chip,
+.printing .quick-chips,
+.printing .filter-card,
+.printing .form-card,
+.printing .budget-card {
+  display: none !important;
+}
 /* ========================================= */
 /* 11. TOAST NOTIFICATIONS                   */
 /* ========================================= */
@@ -445,6 +493,46 @@ body.dark-mode .toast { background: #2d2d2d; color: #fff; box-shadow: 0 8px 24px
   /* Grid Fix: Stack inputs on mobile */
   .filters {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .summary-card {
+    padding: 14px;
+  }
+
+  .summary-card h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .summary-row {
+    padding: 6px 0;
+  }
+
+  .summary-row span {
+    font-size: 13px;
+  }
+
+  .summary-row strong {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .summary-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-row:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  body.dark-mode .summary-row:not(:last-child) {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 }
 
@@ -722,6 +810,10 @@ body.dark-mode .export-container-split {
   background: var(--accent);
   color: white;
   transform: translateY(-2px);
+}
+
+.pdf-hidden {
+  display: none;
 }
 
 body.dark-mode .chip { background: #333; color: #fff; }
