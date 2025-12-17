@@ -165,6 +165,7 @@ const resetBtn = document.getElementById('reset-btn');
 let pieChart = null;
 let lineChart = null;
 let animatedTotal = 0;
+let currentExportData = [];
 
 // 2. Category Configuration
 const defaultCategories = {
@@ -323,6 +324,8 @@ function renderTransactions(txs) {
     if (!txs) {
         txs = transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
     }
+
+    currentExportData = txs;
 
     listEl.innerHTML = '';
     if (txs.length === 0) {
@@ -681,25 +684,30 @@ function clearFilters() {
 }
 
 function exportToCsv() {
-    if (!transactions.length) {
+    // Use the NEW variable from Improvement #1
+    if (!currentExportData.length) {
         showToast('No data available to export!', 'error');
         return;
     }
 
     const header = ['id', 'date', 'description', 'category', 'type', 'amount'];
-    const rows = transactions.map(t => [
+    const rows = currentExportData.map(t => [
         t.id,
         t.date,
-        `"${t.description.replace(/"/g,'""')}"`,
+        `"${t.description.replace(/"/g,'""')}"`, // Escape double quotes
         t.category,
         t.type,
         t.amount
     ]);
 
-    const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const url = URL.createObjectURL(new Blob([csv], {
+    const csvContent = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+    // [THE FIX] Add '\uFEFF' at the start. This is the BOM for UTF-8.
+    const blob = new Blob(['\uFEFF' + csvContent], {
         type: 'text/csv;charset=utf-8;'
-    }));
+    });
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `expense_tracker_${new Date().toLocaleDateString('en-CA')}.csv`;
@@ -709,7 +717,9 @@ function exportToCsv() {
 }
 
 // Ensure jsPDF is loaded
-const { jsPDF } = window.jspdf;
+const {
+    jsPDF
+} = window.jspdf;
 
 function downloadPdf() {
     // 1. SAFETY CHECK
@@ -717,8 +727,8 @@ function downloadPdf() {
         alert("Error: jsPDF library not loaded. Check index.html");
         return;
     }
-    
-    if (!transactions || !transactions.length) {
+
+    if (!currentExportData || !currentExportData.length) {
         showToast('No transactions to download!', 'error');
         return;
     }
@@ -726,7 +736,7 @@ function downloadPdf() {
     // --- HELPER 1: Strip Emojis ---
     const cleanText = (str) => {
         if (!str) return "";
-        return String(str).replace(/[^\x20-\x7E]/g, ""); 
+        return String(str).replace(/[^\x20-\x7E]/g, "");
     };
 
     // --- HELPER 2: Capture Image & Return Dimensions ---
@@ -738,8 +748,8 @@ function downloadPdf() {
             // Resize large charts to prevent crash
             let width = original.width;
             let height = original.height;
-            const maxWidth = 1000; 
-            
+            const maxWidth = 1000;
+
             // Maintain Aspect Ratio
             if (width > maxWidth) {
                 const ratio = maxWidth / width;
@@ -758,8 +768,8 @@ function downloadPdf() {
             ctx.drawImage(original, 0, 0, width, height);
 
             return {
-                img: newCanvas.toDataURL('image/jpeg', 0.8), 
-                ratio: width / height 
+                img: newCanvas.toDataURL('image/jpeg', 0.8),
+                ratio: width / height
             };
         } catch (e) {
             console.warn("Chart export error:", e);
@@ -788,7 +798,9 @@ function downloadPdf() {
                 lineChart.options.scales.y.grid.color = gridColor;
                 lineChart.update('none');
             }
-        } catch (e) { console.warn(e); }
+        } catch (e) {
+            console.warn(e);
+        }
     };
 
     try {
@@ -796,13 +808,13 @@ function downloadPdf() {
         toggleChartTheme(true);
 
         const doc = new jsPDF();
-        
+
         // --- CONFIG ---
-        const themeColor = [42, 157, 143]; 
-        const dangerColor = [230, 57, 70]; 
-        const successColor = [46, 164, 79]; 
-        const navColor = [38, 70, 83];     
-        const pageWidth = doc.internal.pageSize.getWidth(); 
+        const themeColor = [42, 157, 143];
+        const dangerColor = [230, 57, 70];
+        const successColor = [46, 164, 79];
+        const navColor = [38, 70, 83];
+        const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 14;
         const availableWidth = pageWidth - (margin * 2);
@@ -833,12 +845,23 @@ function downloadPdf() {
             body: summaryData,
             startY: 35,
             theme: 'grid',
-            styles: { fontSize: 11, cellPadding: 4, font: "helvetica" },
-            columnStyles: {
-                0: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: 50 },
-                1: { halign: 'right', fontStyle: 'bold' }
+            styles: {
+                fontSize: 11,
+                cellPadding: 4,
+                font: "helvetica"
             },
-            didParseCell: function (data) {
+            columnStyles: {
+                0: {
+                    fontStyle: 'bold',
+                    fillColor: [245, 245, 245],
+                    cellWidth: 50
+                },
+                1: {
+                    halign: 'right',
+                    fontStyle: 'bold'
+                }
+            },
+            didParseCell: function(data) {
                 if (data.section === 'body' && data.column.index === 1) {
                     if (data.row.index === 0) data.cell.styles.textColor = successColor;
                     if (data.row.index === 1) data.cell.styles.textColor = dangerColor;
@@ -866,28 +889,28 @@ function downloadPdf() {
             finalY += 6;
 
             // 1. Base Height
-            let chartHeight = 60; 
+            let chartHeight = 60;
 
             // 2. Calculate Widths
-            let pieW = chartHeight * pieData.ratio; 
+            let pieW = chartHeight * pieData.ratio;
             let lineW = chartHeight * lineData.ratio;
             const gap = 10;
 
             // 3. Auto-Fit Width
             const totalRequiredWidth = pieW + lineW + gap;
-            
+
             if (totalRequiredWidth > availableWidth) {
                 const scaleFactor = availableWidth / totalRequiredWidth;
                 pieW *= scaleFactor;
                 lineW *= scaleFactor;
-                chartHeight *= scaleFactor; 
+                chartHeight *= scaleFactor;
             }
 
             // 4. Draw
             doc.addImage(pieData.img, 'JPEG', margin, finalY, pieW, chartHeight);
             doc.addImage(lineData.img, 'JPEG', margin + pieW + gap, finalY, lineW, chartHeight);
-            
-            finalY += chartHeight + 10; 
+
+            finalY += chartHeight + 10;
         }
 
         // B. RESTORE THEME
@@ -895,8 +918,8 @@ function downloadPdf() {
 
         // --- TRANSACTIONS TABLE ---
         const tableColumn = ["Date", "Description", "Category", "Type", "Amount"];
-        const sortedTxs = transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-        
+        const sortedTxs = currentExportData.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+
         const tableRows = sortedTxs.map(t => {
             const amt = Number(t.amount).toFixed(2);
             const sign = t.type === 'expense' ? '-' : '+';
@@ -912,16 +935,27 @@ function downloadPdf() {
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
-            startY: finalY, 
+            startY: finalY,
             theme: 'striped',
-            headStyles: { fillColor: themeColor, textColor: 255, fontStyle: 'bold' },
-            styles: { fontSize: 10, cellPadding: 3, font: "helvetica" },
+            headStyles: {
+                fillColor: themeColor,
+                textColor: 255,
+                fontStyle: 'bold'
+            },
+            styles: {
+                fontSize: 10,
+                cellPadding: 3,
+                font: "helvetica"
+            },
             columnStyles: {
-                4: { halign: 'right', fontStyle: 'bold' }
+                4: {
+                    halign: 'right',
+                    fontStyle: 'bold'
+                }
             },
             didParseCell: function(data) {
                 if (data.section === 'body' && data.column.index === 4) {
-                    const typeStr = data.row.raw[3]; 
+                    const typeStr = data.row.raw[3];
                     if (typeStr === 'EXPENSE') data.cell.styles.textColor = dangerColor;
                     else data.cell.styles.textColor = successColor;
                 }
@@ -932,13 +966,13 @@ function downloadPdf() {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i); // Go to page i
-            
+
             doc.setFontSize(8);
             doc.setTextColor(150);
-            
+
             // Left: Page Number
             doc.text(`Page ${i} of ${pageCount}`, margin, pageHeight - 10);
-            
+
             // Right: Project Branding
             const brandText = "Student's Expense Tracker";
             const textWidth = doc.getTextWidth(brandText);
@@ -952,7 +986,7 @@ function downloadPdf() {
 
     } catch (error) {
         console.error("PDF Error:", error);
-        toggleChartTheme(false); 
+        toggleChartTheme(false);
         alert("PDF Failed. Try refreshing the page.");
     }
 }
@@ -1224,6 +1258,16 @@ function quickFill(desc, amount, cat) {
     updateCategoryOptions();
     document.getElementById('category').value = cat;
 }
+
+// POWER USER: Press 'Ctrl + Enter' inside the description or amount box to submit
+const handleShortcut = (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+        document.getElementById('add-btn').click();
+    }
+};
+
+document.getElementById('description').addEventListener('keydown', handleShortcut);
+document.getElementById('amount').addEventListener('keydown', handleShortcut);
 
 // Initial Load
 updateCategoryOptions();
